@@ -1,0 +1,519 @@
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import { toast } from 'react-hot-toast';
+
+export default function DataCenter() {
+    const navigate = useNavigate();
+    const [activeTab, setActiveTab] = useState('export'); // export, import, audit, backup, danger
+    const [auditLogs, setAuditLogs] = useState([]);
+    const [startDate, setStartDate] = useState('');
+    const [endDate, setEndDate] = useState('');
+    const [importFile, setImportFile] = useState(null);
+    const [isLoading, setIsLoading] = useState(false);
+
+    // Modal State
+    const [showModal, setShowModal] = useState(false);
+    const [modalAction, setModalAction] = useState(null); // 'transactions', 'factory'
+    const [modalInput, setModalInput] = useState('');
+
+    // Fetch Audit Logs when tab changes
+    useEffect(() => {
+        if (activeTab === 'audit') {
+            fetchAuditLogs();
+        }
+    }, [activeTab]);
+
+    const fetchAuditLogs = async () => {
+        try {
+            const token = localStorage.getItem('token');
+            const res = await axios.get('http://localhost:3000/api/admin/audit-logs', {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            setAuditLogs(res.data);
+        } catch (err) {
+            if (err.response && err.response.status === 401) {
+                toast.error('Sesi berakhir, silakan login kembali');
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
+                navigate('/login');
+            } else {
+                toast.error('Gagal mengambil audit logs');
+            }
+        }
+    };
+
+    const handleExport = async (type) => {
+        try {
+            setIsLoading(true);
+            const token = localStorage.getItem('token');
+            let url = `http://localhost:3000/api/admin/export/${type}`;
+            if (type === 'sales' && startDate && endDate) {
+                url += `?startDate=${startDate}&endDate=${endDate}`;
+            }
+
+            const response = await axios.get(url, {
+                headers: { Authorization: `Bearer ${token}` },
+                responseType: 'blob', // Important for file download
+            });
+
+            // Create download link
+            const downloadUrl = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement('a');
+            link.href = downloadUrl;
+            const dateStr = new Date().toISOString().slice(0, 10);
+            link.setAttribute('download', `Warkop-${type}-${dateStr}.xlsx`);
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            toast.success(`Berhasil export data ${type}`);
+        } catch (err) {
+            console.error(err);
+            toast.error('Gagal export data');
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const handleImport = async (type) => {
+        if (!importFile) return toast.error('Pilih file terlebih dahulu');
+
+        const formData = new FormData();
+        formData.append('file', importFile);
+
+        try {
+            setIsLoading(true);
+            const token = localStorage.getItem('token');
+            const res = await axios.post(`http://localhost:3000/api/admin/import/${type}`, formData, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'multipart/form-data'
+                }
+            });
+            toast.success(`Import Berhasil: ${res.data.created} baru, ${res.data.updated} diperbarui`);
+            setImportFile(null);
+            // Reset file input value manually if needed
+            document.getElementById('fileInput').value = '';
+        } catch (err) {
+            console.error(err);
+            toast.error(err.response?.data?.error || 'Gagal import data');
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const handleBackup = async () => {
+        try {
+            setIsLoading(true);
+            const token = localStorage.getItem('token');
+            const response = await axios.get('http://localhost:3000/api/admin/backup', {
+                headers: { Authorization: `Bearer ${token}` },
+                responseType: 'blob'
+            });
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', `Warkop-FullBackup-${Date.now()}.json`);
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            toast.success('Backup berhasil didownload');
+        } catch (err) {
+            toast.error('Backup gagal');
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const handleDangerAction = async () => {
+        try {
+            setIsLoading(true);
+            const token = localStorage.getItem('token');
+            const payload = { confirmation: modalInput, password: modalInput };
+
+            // Adjust payload based on action
+            if (modalAction === 'transactions') {
+                if (modalInput !== 'HAPUS TRANSAKSI') {
+                    setIsLoading(false);
+                    return toast.error('Konfirmasi teks salah');
+                }
+            }
+            // For factory reset, input acts as password
+
+            const res = await axios.post(`http://localhost:3000/api/admin/reset/${modalAction}`, payload, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+
+            toast.success(res.data.message);
+            setShowModal(false);
+            setModalInput('');
+        } catch (err) {
+            toast.error(err.response?.data?.error || 'Gagal melakukan aksi');
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const openModal = (action) => {
+        setModalAction(action);
+        setModalInput('');
+        setShowModal(true);
+    };
+
+    return (
+        <div className="p-6 min-h-screen bg-[#0F0A2A] text-white">
+            <div className="mb-8">
+                <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+                    Pusat Data
+                </h1>
+                <p className="text-gray-400 mt-2">Pusat kontrol untuk Export, Import, Audit, dan Maintenance Database.</p>
+            </div>
+
+            {/* Tabs */}
+            <div className="flex flex-wrap gap-2 mb-8 border-b border-purple-500/30 pb-1">
+                {[
+                    { id: 'export', label: '⬇️ Export Data' },
+                    { id: 'import', label: '⬆️ Import Data' },
+                    { id: 'audit', label: '👁️ Audit Log' },
+                    { id: 'backup', label: '💾 Backup & Restore' },
+                    { id: 'danger', label: '⚠️ Danger Zone' }
+                ].map(tab => (
+                    <button
+                        key={tab.id}
+                        onClick={() => setActiveTab(tab.id)}
+                        className={`px-4 py-2 rounded-t-lg transition-colors font-medium ${activeTab === tab.id
+                            ? 'bg-purple-600 text-white'
+                            : 'bg-transparent text-gray-400 hover:text-white hover:bg-white/5'
+                            }`}
+                    >
+                        {tab.label}
+                    </button>
+                ))}
+            </div>
+
+            {/* Content Area */}
+            <div className="bg-[#151235] rounded-xl p-6 border border-purple-500/20 shadow-xl min-h-[400px]">
+
+                {/* EXPORT TAB */}
+                {activeTab === 'export' && (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {/* Sales Card */}
+                        <div className="bg-[#1E1B4B] p-5 rounded-lg border border-purple-500/30 hover:border-purple-400 transition-colors">
+                            <div className="text-4xl mb-3">💰</div>
+                            <h3 className="text-xl font-bold mb-2">Laporan Penjualan</h3>
+                            <p className="text-sm text-gray-400 mb-4">Export data transaksi penjualan dengan filter tanggal.</p>
+
+                            <div className="flex flex-col gap-2 mb-4">
+                                <input
+                                    type="date"
+                                    className="bg-[#0F0A2A] border border-purple-500/30 rounded px-2 py-1 text-sm text-white"
+                                    value={startDate}
+                                    onChange={e => setStartDate(e.target.value)}
+                                />
+                                <input
+                                    type="date"
+                                    className="bg-[#0F0A2A] border border-purple-500/30 rounded px-2 py-1 text-sm text-white"
+                                    value={endDate}
+                                    onChange={e => setEndDate(e.target.value)}
+                                />
+                            </div>
+
+                            <button
+                                onClick={() => handleExport('sales')}
+                                disabled={isLoading}
+                                className="w-full bg-purple-600 hover:bg-purple-500 text-white py-2 rounded-lg font-medium transition-colors disabled:opacity-50"
+                            >
+                                {isLoading ? 'Processing...' : 'Download .xlsx'}
+                            </button>
+                        </div>
+
+                        {/* Menu Card */}
+                        <div className="bg-[#1E1B4B] p-5 rounded-lg border border-purple-500/30 hover:border-purple-400 transition-colors">
+                            <div className="text-4xl mb-3">🍽️</div>
+                            <h3 className="text-xl font-bold mb-2">Data Menu</h3>
+                            <p className="text-sm text-gray-400 mb-4">Daftar lengkap menu, harga, kategori, dan status ketersediaan.</p>
+                            <div className="mt-auto pt-8">
+                                <button
+                                    onClick={() => handleExport('menu')}
+                                    disabled={isLoading}
+                                    className="w-full bg-blue-600 hover:bg-blue-500 text-white py-2 rounded-lg font-medium transition-colors disabled:opacity-50"
+                                >
+                                    Download .xlsx
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Stock Card */}
+                        <div className="bg-[#1E1B4B] p-5 rounded-lg border border-purple-500/30 hover:border-purple-400 transition-colors">
+                            <div className="text-4xl mb-3">📦</div>
+                            <h3 className="text-xl font-bold mb-2">Laporan Stok</h3>
+                            <p className="text-sm text-gray-400 mb-4">Posisi stok terakhir bahan baku dan nilai aset inventaris.</p>
+                            <div className="mt-auto pt-8">
+                                <button
+                                    onClick={() => handleExport('stock')}
+                                    disabled={isLoading}
+                                    className="w-full bg-green-600 hover:bg-green-500 text-white py-2 rounded-lg font-medium transition-colors disabled:opacity-50"
+                                >
+                                    Download .xlsx
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* IMPORT TAB */}
+                {activeTab === 'import' && (
+                    <div className="max-w-2xl mx-auto">
+                        <div className="bg-yellow-500/10 border border-yellow-500/30 p-4 rounded-lg mb-6 text-yellow-200 text-sm">
+                            <strong>Tips:</strong> Pastikan format kolom Excel sesuai dengan template. ID akan dihasilkan otomatis jika kosong.
+                            Nama Menu/Bahan yang sama akan mengupdate data yang sudah ada (Update), yang baru akan ditambahkan (Insert).
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                            <div className="bg-[#1E1B4B] p-6 rounded-xl border border-dashed border-purple-500/50 flex flex-col items-center justify-center text-center">
+                                <div className="text-5xl mb-4">🍽️</div>
+                                <h3 className="font-bold mb-2">Import Menu</h3>
+                                <p className="text-xs text-gray-400 mb-4">Upgrade daftar menu secara massal.</p>
+                                {/* In a real app, provide a link to a static template file */}
+                                <button className="text-purple-400 text-sm hover:underline mb-4">Download Template Menu</button>
+
+                                <input
+                                    type="file"
+                                    id="fileInput"
+                                    accept=".xlsx, .xls"
+                                    onChange={e => setImportFile(e.target.files[0])}
+                                    className="block w-full text-sm text-gray-400
+                        file:mr-4 file:py-2 file:px-4
+                        file:rounded-full file:border-0
+                        file:text-sm file:font-semibold
+                        file:bg-purple-600 file:text-white
+                        hover:file:bg-purple-700
+                        mb-4"
+                                />
+                                <button
+                                    onClick={() => handleImport('menu')}
+                                    disabled={isLoading}
+                                    className="w-full bg-purple-600 hover:bg-purple-500 text-white py-2 rounded-lg"
+                                >
+                                    {isLoading ? 'Uploading...' : 'Upload Data Menu'}
+                                </button>
+                            </div>
+
+                            <div className="bg-[#1E1B4B] p-6 rounded-xl border border-dashed border-green-500/50 flex flex-col items-center justify-center text-center">
+                                <div className="text-5xl mb-4">🥬</div>
+                                <h3 className="font-bold mb-2">Import Bahan Baku</h3>
+                                <p className="text-xs text-gray-400 mb-4">Update inventaris & stok awal.</p>
+                                <button className="text-green-400 text-sm hover:underline mb-4">Download Template Stok</button>
+
+                                <input
+                                    type="file"
+                                    accept=".xlsx, .xls"
+                                    onChange={e => setImportFile(e.target.files[0])}
+                                    className="block w-full text-sm text-gray-400
+                        file:mr-4 file:py-2 file:px-4
+                        file:rounded-full file:border-0
+                        file:text-sm file:font-semibold
+                        file:bg-green-600 file:text-white
+                        hover:file:bg-green-700
+                        mb-4"
+                                />
+                                <button
+                                    onClick={() => handleImport('stock')}
+                                    disabled={isLoading}
+                                    className="w-full bg-green-600 hover:bg-green-500 text-white py-2 rounded-lg"
+                                >
+                                    {isLoading ? 'Uploading...' : 'Upload Data Stok'}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* AUDIT TAB */}
+                {activeTab === 'audit' && (
+                    <div>
+                        <div className="flex justify-between items-center mb-4">
+                            <h3 className="text-xl font-bold">Riwayat Aktivitas</h3>
+                            <button onClick={fetchAuditLogs} className="bg-white/10 hover:bg-white/20 px-3 py-1 rounded text-sm">Refresh</button>
+                        </div>
+
+                        <div className="overflow-x-auto rounded-lg border border-purple-500/30">
+                            <table className="w-full text-left font-sm">
+                                <thead className="bg-[#1E1B4B] text-gray-300">
+                                    <tr>
+                                        <th className="p-3">Waktu</th>
+                                        <th className="p-3">User</th>
+                                        <th className="p-3">Role</th>
+                                        <th className="p-3">Action</th>
+                                        <th className="p-3">Target</th>
+                                        <th className="p-3">Details</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-purple-500/10">
+                                    {auditLogs.length > 0 ? auditLogs.map(log => (
+                                        <tr key={log._id} className="hover:bg-white/5">
+                                            <td className="p-3 text-gray-400 text-xs">
+                                                {new Date(log.timestamp).toLocaleString()}
+                                            </td>
+                                            <td className="p-3 font-medium">{log.userName || log.userId}</td>
+                                            <td className="p-3 text-xs opacity-70">{log.role}</td>
+                                            <td className="p-3">
+                                                <span className={`px-2 py-1 rounded text-xs font-bold ${log.action === 'DELETE' || log.action === 'RESET' ? 'bg-red-500/20 text-red-400' :
+                                                    log.action === 'CREATE' ? 'bg-green-500/20 text-green-400' :
+                                                        'bg-blue-500/20 text-blue-400'
+                                                    }`}>
+                                                    {log.action}
+                                                </span>
+                                            </td>
+                                            <td className="p-3 text-sm">{log.target}</td>
+                                            <td className="p-3 text-sm text-gray-300">{log.details}</td>
+                                        </tr>
+                                    )) : (
+                                        <tr>
+                                            <td colSpan="6" className="p-8 text-center text-gray-500">Belum ada aktivitas tercatat</td>
+                                        </tr>
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                )}
+
+                {/* BACKUP TAB */}
+                {activeTab === 'backup' && (
+                    <div className="flex flex-col items-center justify-center py-12 text-center">
+                        <div className="text-6xl mb-6">💾</div>
+                        <h2 className="text-2xl font-bold mb-4">Disaster Recovery</h2>
+                        <p className="max-w-md text-gray-400 mb-8">
+                            Download seluruh data database (Menu, Stok, Transaksi, Pelanggan) dalam format JSON terkompresi.
+                            Simpan file ini di tempat aman secara berkala.
+                        </p>
+
+                        <div className="flex gap-4">
+                            <button
+                                onClick={handleBackup}
+                                disabled={isLoading}
+                                className="flex items-center gap-2 bg-blue-600 hover:bg-blue-500 px-8 py-3 rounded-xl font-bold text-lg transition-transform hover:scale-105 disabled:opacity-50"
+                            >
+                                <span>⬇️</span> Download Full Backup
+                            </button>
+
+                            <input
+                                type="file"
+                                id="restoreInput"
+                                accept=".json"
+                                className="hidden"
+                                onChange={(e) => {
+                                    if (e.target.files[0]) {
+                                        // Trigger confirmation logic or direct upload? 
+                                        // Let's use the modal for safety
+                                        setImportFile(e.target.files[0]);
+                                        setModalInput(''); // Reset
+                                        setModalAction('restore');
+                                        setShowModal(true);
+                                    }
+                                }}
+                            />
+                            <button
+                                onClick={() => document.getElementById('restoreInput').click()}
+                                disabled={isLoading}
+                                className="flex items-center gap-2 bg-gray-700 hover:bg-gray-600 px-8 py-3 rounded-xl font-bold text-lg text-gray-300 transition-transform hover:scale-105 disabled:opacity-50"
+                            >
+                                <span>⬆️</span> Restore Database
+                            </button>
+                        </div>
+                    </div>
+                )}
+
+                {/* DANGER ZONE TAB */}
+                {activeTab === 'danger' && (
+                    <div className="border border-red-500/50 rounded-xl overflow-hidden">
+                        <div className="bg-red-500/10 p-4 border-b border-red-500/30 flex items-center gap-3">
+                            <span className="text-2xl">☢️</span>
+                            <h3 className="text-xl font-bold text-red-400">Danger Zone</h3>
+                        </div>
+
+                        <div className="p-6 bg-[#0a0510] space-y-6">
+
+                            {/* Delete Transactions */}
+                            <div className="flex flex-col md:flex-row justify-between items-center gap-4 p-4 border border-red-900/30 rounded-lg bg-red-900/10">
+                                <div>
+                                    <h4 className="text-lg font-bold text-white">Hapus Data Transaksi</h4>
+                                    <p className="text-sm text-red-300">
+                                        Menghapus permanen SEMUA data Pesanan, Riwayat Stok, dan Transaksi Kas.
+                                        <br />Data Master (Menu, Bahan, User) TIDAK akan terhapus.
+                                    </p>
+                                </div>
+                                <button
+                                    onClick={() => openModal('transactions')}
+                                    className="bg-red-600 hover:bg-red-700 text-white px-5 py-2 rounded-lg font-bold whitespace-nowrap"
+                                >
+                                    Hapus Transaksi
+                                </button>
+                            </div>
+
+                            {/* Factory Reset */}
+                            <div className="flex flex-col md:flex-row justify-between items-center gap-4 p-4 border border-red-900/30 rounded-lg bg-red-900/10">
+                                <div>
+                                    <h4 className="text-lg font-bold text-white">Factory Reset (Pabrik)</h4>
+                                    <p className="text-sm text-red-300">
+                                        MENGOSONGKAN SELURUH DATABASE. Semua data akan hilang kecuali akun Admin yang sedang login.
+                                        <br />Tindakan ini tidak dapat dibatalkan.
+                                    </p>
+                                </div>
+                                <button
+                                    onClick={() => openModal('factory')}
+                                    className="border border-red-500 text-red-500 hover:bg-red-500 hover:text-white px-5 py-2 rounded-lg font-bold whitespace-nowrap transition-colors"
+                                >
+                                    Factory Reset
+                                </button>
+                            </div>
+
+                        </div>
+                    </div>
+                )}
+
+            </div>
+
+            {/* CONFIRMATION MODAL */}
+            {showModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in">
+                    <div className="bg-[#151235] border border-red-500 rounded-xl p-6 max-w-md w-full shadow-2xl scale-100">
+                        <h3 className="text-2xl font-bold text-red-500 mb-4">Konfirmasi Tindakan</h3>
+
+                        <p className="text-gray-300 mb-6">
+                            {modalAction === 'transactions'
+                                ? 'Anda akan menghapus SELURUH data transaksi. Ketik "HAPUS TRANSAKSI" untuk konfirmasi.'
+                                : 'Anda akan melakukan FACTORY RESET. Masukkan Password Admin untuk konfirmasi.'
+                            }
+                        </p>
+
+                        <input
+                            type={modalAction === 'factory' ? 'password' : 'text'}
+                            value={modalInput}
+                            onChange={(e) => setModalInput(modalAction === 'transactions' ? e.target.value.toUpperCase() : e.target.value)}
+                            className="w-full bg-[#0F0A2A] border border-red-500/50 rounded-lg px-4 py-3 text-white mb-6 focus:outline-none focus:border-red-500"
+                            placeholder={modalAction === 'transactions' ? 'Ketik disini...' : 'Password Admin'}
+                        />
+
+                        <div className="flex gap-3 justify-end">
+                            <button
+                                onClick={() => setShowModal(false)}
+                                className="px-4 py-2 rounded-lg text-gray-400 hover:text-white hover:bg-white/10"
+                            >
+                                Batal
+                            </button>
+                            <button
+                                onClick={handleDangerAction}
+                                disabled={!modalInput}
+                                className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg font-bold disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                Konfirmasi  🚀
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+}

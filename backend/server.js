@@ -1,0 +1,77 @@
+require('dotenv').config();
+const express = require('express');
+const mongoose = require('mongoose');
+const cors = require('cors');
+const path = require('path');
+const compression = require('compression');
+
+// Initialize App
+const app = express();
+app.use(compression());
+const allowedOrigins = [
+  'http://localhost:5173',
+  'http://localhost:5174',
+  process.env.FRONTEND_URL // Useful for production deployment
+].filter(Boolean);
+
+app.use(cors({
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'x-api-key']
+}));
+app.use(express.json({ limit: '50mb' }));
+
+// ===== STATIC FILES =====
+app.use('/uploads', express.static(path.join(__dirname, 'public', 'uploads')));
+app.use('/admin', express.static(path.join(__dirname, 'public', 'admin')));
+app.use('/', express.static(path.join(__dirname, 'public', 'customer')));
+
+// ===== DATABASE =====
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/warkop';
+mongoose.connect(MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(() => console.log('✅ Connected to MongoDB'))
+  .catch(err => console.error('❌ MongoDB connection error:', err));
+
+// ===== ROUTES =====
+app.use('/api/inventory', require('./routes/inventoryRoutes'));
+app.use('/api/ingredients', require('./routes/inventoryRoutes')); // Alias for legacy support
+app.use('/api/gramasi', require('./routes/gramasiRoutes'));
+app.use('/api/menu', require('./routes/menuRoutes'));
+app.use('/api/recipes', require('./routes/recipeRoutes'));
+app.use('/api/orders', require('./routes/orderRoutes'));
+app.use('/api/customers', require('./routes/customerRoutes'));
+app.use('/api/shifts', require('./routes/shiftRoutes'));
+app.use('/api/shift', require('./routes/shiftRoutes')); // Alias for singular (legacy/POS support)
+app.use('/api/finance', require('./routes/financeRoutes'));
+
+app.use('/api/tables', require('./routes/tableRoutes'));
+app.use('/api/employees', require('./routes/employeeRoutes'));
+app.use('/api/settings', require('./routes/settingsRoutes'));
+app.use('/api/analytics', require('./routes/analyticsRoutes'));
+
+// New Routes (Refactored)
+app.use('/api', require('./routes/authRoutes')); // Mounts /login -> /api/login
+app.use('/api/data', require('./routes/dataRoutes'));
+app.use('/api/upload', require('./routes/uploadRoutes'));
+app.use('/api/cash', require('./routes/cashRoutes'));
+app.use('/api/cash-transactions', require('./routes/cashTransactionRoutes')); // New Link
+app.use('/api/debts', require('./routes/debtRoutes'));
+app.use('/api/attendance', require('./routes/attendanceRoutes'));
+app.use('/api/payroll', require('./routes/payrollRoutes'));
+app.use('/api/stats', require('./routes/statsRoutes'));
+app.use('/api/categories', require('./routes/categoryRoutes'));
+app.use('/api/users', require('./routes/userRoutes'));
+
+// ===== START SERVER =====
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));

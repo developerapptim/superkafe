@@ -1,0 +1,29 @@
+{
+  "name": "warkop-backend",
+  "version": "0.1.0",
+  "description": "Backend API for Warkop Management System",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "migrate-file": "node scripts/migrate-file.js",
+    "docker-build": "docker build -t warkop-backend ."
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "compression": "^1.8.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.0",
+    "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.0",
+    "mongoose": "^7.0.0",
+    "multer": "^2.0.2",
+    "node-fetch": "3.3.2",
+    "xlsx": "^0.18.5"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.22"
+  }
+}

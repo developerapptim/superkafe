@@ -1,0 +1,201 @@
+import axios from 'axios';
+
+// Create axios instance with dynamic baseURL for development & production
+const api = axios.create({
+    baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api',
+    withCredentials: true, // Required for cookies/sessions across domains
+    headers: {
+        'Content-Type': 'application/json',
+    },
+});
+
+// Request interceptor: Pre-process requests (e.g., adding tokens, handling FormData)
+api.interceptors.request.use((config) => {
+    // 1. If sending FormData, let the browser set the Content-Type with boundary
+    if (config.data instanceof FormData) {
+        delete config.headers['Content-Type'];
+    }
+
+    // 2. Add API key (preserving your existing logic)
+    config.headers['x-api-key'] = 'warkop_secret_123';
+
+    // 3. Add JWT Token for protected routes
+    const token = localStorage.getItem('token');
+    if (token) {
+        config.headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    return config;
+}, (error) => {
+    return Promise.reject(error);
+});
+
+// Response interceptor: Global error handling
+api.interceptors.response.use(
+    (response) => response,
+    (error) => {
+        console.error('API Error:', error.response?.data || error.message);
+        return Promise.reject(error);
+    }
+);
+
+// ========== MENU API ==========
+export const menuAPI = {
+    getAll: () => api.get('/menu'),
+    getById: (id) => api.get(`/menu/${id}`),
+    create: (data) => api.post('/menu', data),
+    reorder: (items) => api.put('/menu/reorder', { items }),
+    update: (id, data) => api.put(`/menu/${id}`, data),
+    delete: (id) => api.delete(`/menu/${id}`),
+};
+
+// ========== ORDERS API ==========
+export const ordersAPI = {
+    getAll: () => api.get('/orders'),
+    getToday: () => api.get('/orders/today'),
+    getById: (id) => api.get(`/orders/${id}`),
+    create: (data) => api.post('/orders', data),
+    updateStatus: (id, status) => api.patch(`/orders/${id}/status`, { status }),
+    payOrder: (id, paymentMethod) => api.patch(`/orders/${id}/pay`, { paymentMethod }),
+    delete: (id) => api.delete(`/orders/${id}`),
+    // New endpoints for smart matching and merging
+    checkPhone: (phone) => api.post('/orders/check-phone', { phone }),
+    merge: (orderIds) => api.post('/orders/merge', { orderIds }),
+    appendItems: (id, items) => api.patch(`/orders/${id}/append`, { items }),
+};
+
+
+// ========== CATEGORIES API ==========
+export const categoriesAPI = {
+    getAll: () => api.get('/categories'),
+    create: (data) => api.post('/categories', data),
+    update: (id, data) => api.put(`/categories/${id}`, data),
+    delete: (id) => api.delete(`/categories/${id}`),
+};
+
+// ========== TABLES API ==========
+export const tablesAPI = {
+    getAll: () => api.get('/tables'),
+    create: (data) => api.post('/tables', data),
+    updateStatus: (id, status) => api.patch(`/tables/${id}/status`, { status }),
+    getTableOrders: (tableId) => api.get(`/tables/${tableId}/orders`),
+    moveTable: (fromId, toId) => api.post(`/tables/${fromId}/move/${toId}`),
+    markClean: (id) => api.patch(`/tables/${id}/clean`),
+    delete: (id) => api.delete(`/tables/${id}`),
+};
+
+// ========== SHIFT API ==========
+export const shiftAPI = {
+    getCurrent: () => api.get('/shifts/current'),
+    getCurrentBalance: () => api.get('/shifts/current-balance'),
+    startShift: (data) => api.post('/shifts/start', data),
+    endShift: (data) => api.post('/shifts/end', data),
+    getActivities: () => api.get('/shifts/activities'), // NEW
+};
+
+// ========== INVENTORY API ==========
+export const inventoryAPI = {
+    getAll: () => api.get('/inventory'),
+    getLowStock: () => api.get('/inventory/low-stock'),
+    create: (data) => api.post('/inventory', data),
+    update: (id, data) => api.put(`/inventory/${id}`, data),
+    adjustStock: (id, adjustment) => api.put(`/inventory/${id}/stock`, adjustment),
+    delete: (id) => api.delete(`/inventory/${id}`),
+    getHistory: (params) => api.get('/inventory/history', { params }),
+    getTopUsage: () => api.get('/inventory/top-usage'),
+    restock: (data) => api.post('/inventory/restock', data),
+};
+
+// ========== EMPLOYEES API ==========
+export const employeesAPI = {
+    getAll: () => api.get('/employees'),
+    getById: (id) => api.get(`/employees/${id}`),
+    create: (data) => api.post('/employees', data),
+    update: (id, data) => api.put(`/employees/${id}`, data),
+    delete: (id) => api.delete(`/employees/${id}`),
+    verifyPin: (pin_code) => api.post('/employees/verify-pin', { pin_code }),
+};
+
+// ========== ATTENDANCE API ==========
+export const attendanceAPI = {
+    getAll: (params) => api.get('/attendance', { params }),
+    getToday: () => api.get('/attendance/today'),
+    clockIn: (employee_id) => api.post('/attendance/clock-in', { employee_id }),
+    clockOut: (employee_id) => api.post('/attendance/clock-out', { employee_id }),
+    create: (data) => api.post('/attendance', data),
+    update: (id, data) => api.patch(`/attendance/${id}`, data),
+};
+
+// ========== PAYROLL API ==========
+export const payrollAPI = {
+    calculate: (employee_id, start_date, end_date) =>
+        api.post('/payroll/calculate', { employee_id, start_date, end_date }),
+};
+
+
+// ========== REPORTS API ==========
+export const reportsAPI = {
+    getDashboardStats: () => api.get('/stats'),
+    getDailySummary: (date) => api.get(`/reports/daily?date=${date}`),
+    getSalesReport: (startDate, endDate) => api.get(`/reports/sales?start=${startDate}&end=${endDate}`),
+    getTopProducts: (limit = 5) => api.get(`/reports/top-products?limit=${limit}`),
+};
+
+// ========== SETTINGS API ==========
+export const settingsAPI = {
+    get: () => api.get('/settings'),
+    update: (data) => api.put('/settings', data),
+    updateLoyalty: (loyaltySettings) => api.put('/settings', { loyaltySettings }),
+    uploadSound: (formData) => api.post('/settings/upload-sound', formData),
+    addUnit: (unit) => api.post('/settings/units', { unit }),
+    removeUnit: (unitName) => api.delete(`/settings/units/${unitName}`),
+};
+
+// ========== RECIPES/GRAMASI API ==========
+export const recipesAPI = {
+    getAll: () => api.get('/recipes'),
+    getByMenuId: (menuId) => api.get(`/recipes/${menuId}`),
+    create: (data) => api.post('/recipes', data),
+    update: (menuId, data) => api.put(`/recipes/${menuId}`, data),
+    delete: (menuId) => api.delete(`/recipes/${menuId}`),
+};
+
+// ========== CASH TRANSACTIONS API ==========
+export const cashTransactionsAPI = {
+    getAll: () => api.get('/cash-transactions'),
+    getSummary: () => api.get('/cash-transactions/summary'),
+    create: (data) => api.post('/cash-transactions', data),
+    delete: (id) => api.delete(`/cash-transactions/${id}`),
+};
+
+// ========== CASH ANALYTICS API ==========
+export const cashAnalyticsAPI = {
+    getAnalytics: () => api.get('/cash/analytics'),
+    getBreakdown: () => api.get('/cash/breakdown'),
+};
+
+// ========== DEBTS API (Kasbon & Piutang) ==========
+export const debtsAPI = {
+    getAll: (params) => api.get('/debts', { params }),
+    create: (data) => api.post('/debts', data),
+    settle: (id) => api.patch(`/debts/${id}/settle`),
+    delete: (id) => api.delete(`/debts/${id}`),
+};
+
+// ========== CUSTOMERS API ==========
+export const customersAPI = {
+    getAll: () => api.get('/customers'),
+    getById: (id) => api.get(`/customers/${id}`),
+    create: (data) => api.post('/customers', data),
+    update: (id, data) => api.put(`/customers/${id}`, data),
+    delete: (id) => api.delete(`/customers/${id}`),
+};
+
+// ========== USER API ==========
+export const userAPI = {
+    changePassword: (data) => api.put('/users/change-password', data),
+};
+
+export default api;
+
+
