@@ -27,7 +27,7 @@ export default function DataCenter() {
     const fetchAuditLogs = async () => {
         try {
             const token = localStorage.getItem('token');
-            const res = await axios.get('http://localhost:3000/api/admin/audit-logs', {
+            const res = await axios.get('https://superkafe-production.up.railway.app/api/admin/audit-logs', {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setAuditLogs(res.data);
@@ -47,7 +47,7 @@ export default function DataCenter() {
         try {
             setIsLoading(true);
             const token = localStorage.getItem('token');
-            let url = `http://localhost:3000/api/admin/export/${type}`;
+            let url = `https://superkafe-production.up.railway.app/api/admin/export/${type}`;
             if (type === 'sales' && startDate && endDate) {
                 url += `?startDate=${startDate}&endDate=${endDate}`;
             }
@@ -84,7 +84,7 @@ export default function DataCenter() {
         try {
             setIsLoading(true);
             const token = localStorage.getItem('token');
-            const res = await axios.post(`http://localhost:3000/api/admin/import/${type}`, formData, {
+            const res = await axios.post(`https://superkafe-production.up.railway.app/api/admin/import/${type}`, formData, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                     'Content-Type': 'multipart/form-data'
@@ -106,7 +106,7 @@ export default function DataCenter() {
         try {
             setIsLoading(true);
             const token = localStorage.getItem('token');
-            const response = await axios.get('http://localhost:3000/api/admin/backup', {
+            const response = await axios.get('https://superkafe-production.up.railway.app/api/admin/backup', {
                 headers: { Authorization: `Bearer ${token}` },
                 responseType: 'blob'
             });
@@ -140,7 +140,7 @@ export default function DataCenter() {
             }
             // For factory reset, input acts as password
 
-            const res = await axios.post(`http://localhost:3000/api/admin/reset/${modalAction}`, payload, {
+            const res = await axios.post(`https://superkafe-production.up.railway.app/api/admin/reset/${modalAction}`, payload, {
                 headers: { Authorization: `Bearer ${token}` }
             });
 
