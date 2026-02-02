@@ -23,7 +23,6 @@ function Login() {
         try {
             // Adjust API URL based on your proxy setup or direct
             const response = await api.post('/auth/login', {
-                ...
                 username,
                 password
             });
