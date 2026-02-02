@@ -11,6 +11,7 @@ app.use(compression());
 const allowedOrigins = [
   'http://localhost:5173',
   'http://localhost:5174',
+  'https://superkafe.vercel.app',
   process.env.FRONTEND_URL // Useful for production deployment
 ].filter(Boolean);
 
