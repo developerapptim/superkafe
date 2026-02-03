@@ -14,5 +14,6 @@ router.post('/check-phone', checkApiKey, OrderController.checkPhone);
 router.post('/', uploadPayment.single('paymentProof'), OrderController.createOrder);
 
 router.patch('/:id/status', checkApiKey, OrderController.updateOrderStatus);
+router.patch('/:id/pay', checkApiKey, OrderController.payOrder); // Fix: Add pay route
 
 module.exports = router;

@@ -90,7 +90,8 @@ exports.createOrder = async (req, res) => {
 
                             // DEDUCT STOCK (Only Physical)
                             if (ingData.type === 'physical' || !ingData.type) { // Default physical
-                                const qtyToDeduct = required * item.count; // item.count is qty ordered
+                                const qtyOrdered = Number(item.qty || item.count || 0);
+                                const qtyToDeduct = required * qtyOrdered;
 
                                 // Update Ingredient
                                 ingData.stok -= qtyToDeduct;
@@ -115,7 +116,8 @@ exports.createOrder = async (req, res) => {
                     }
                 }
 
-                orderTotalHPP += (itemHPP * item.count);
+                const qtyOrdered = Number(item.qty || item.count || 0);
+                orderTotalHPP += (itemHPP * qtyOrdered);
 
                 // Push to enriched items
                 enrichedItems.push({
@@ -175,8 +177,12 @@ exports.createOrder = async (req, res) => {
         res.status(201).json(newOrder);
 
     } catch (err) {
-        console.error('Create Order Error:', err);
-        res.status(500).json({ error: 'Server error' });
+        console.error('❌ Create Order Error:', err);
+        // Log validation errors specifically
+        if (err.name === 'ValidationError') {
+            console.error('Validation Details:', JSON.stringify(err.errors, null, 2));
+        }
+        res.status(500).json({ error: 'Server error', details: err.message });
     }
 };
 
@@ -214,6 +220,63 @@ exports.updateOrderStatus = async (req, res) => {
         res.json(order);
     } catch (err) {
         console.error(err);
+        res.status(500).json({ error: 'Server error' });
+    }
+};
+exports.payOrder = async (req, res) => {
+    try {
+        const { paymentMethod, note } = req.body;
+        const order = await Order.findOne({ id: req.params.id });
+
+        if (!order) return res.status(404).json({ error: 'Order not found' });
+        if (order.paymentStatus === 'paid') return res.status(400).json({ error: 'Order already paid' });
+
+        // 1. Update Order
+        order.paymentStatus = 'paid';
+        order.paymentMethod = paymentMethod || 'cash';
+        order.status = 'done'; // Complete the order
+        if (note) order.note = note;
+
+        // 2. Update Shift (Record Sales)
+        const activeShift = await Shift.findOne({ endTime: null });
+        if (activeShift) {
+            if (order.paymentMethod === 'cash') {
+                activeShift.cashSales = (activeShift.cashSales || 0) + order.total;
+                activeShift.currentCash = (activeShift.currentCash || 0) + order.total;
+            } else {
+                activeShift.nonCashSales = (activeShift.nonCashSales || 0) + order.total;
+                activeShift.currentNonCash = (activeShift.currentNonCash || 0) + order.total;
+            }
+
+            if (!activeShift.orders) activeShift.orders = [];
+            activeShift.orders.push(order.id);
+
+            await activeShift.save();
+        }
+
+        // 3. Update Customer Loyalty
+        if (order.customerId && order.customerId !== 'guest') {
+            const customer = await Customer.findOne({ id: order.customerId });
+            if (customer) {
+                const settings = await Settings.findOne({ key: 'businessSettings' });
+                const ratio = settings?.loyaltySettings?.pointRatio || 10000;
+                const pointsEarned = Math.floor(order.total / ratio);
+
+                customer.totalSpent += order.total;
+                customer.visitCount += 1;
+                customer.points += pointsEarned;
+                customer.lastOrderDate = new Date();
+                if (pointsEarned > 0) customer.lastPointsEarned = new Date();
+
+                await customer.save();
+            }
+        }
+
+        await order.save();
+
+        res.json(order);
+    } catch (err) {
+        console.error('Pay Order Error:', err);
         res.status(500).json({ error: 'Server error' });
     }
 };

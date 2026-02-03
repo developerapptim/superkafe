@@ -217,14 +217,21 @@ exports.getRecipes = async (req, res) => {
 
 exports.updateRecipe = async (req, res) => {
     try {
-        const { ingredients } = req.body;
+        const { ingredients, menuId: bodyMenuId } = req.body;
+        // Fix: Use params.menuId if available (PUT /:menuId), otherwise use body.menuId (POST /)
+        const targetMenuId = req.params.menuId || bodyMenuId;
+
+        if (!targetMenuId) {
+            return res.status(400).json({ error: 'Menu ID is required' });
+        }
+
         const item = await Recipe.findOneAndUpdate(
-            { menuId: req.params.menuId },
+            { menuId: targetMenuId },
             { ingredients },
             { upsert: true, new: true }
         );
 
-        await logActivity({ req, action: 'UPDATE_RECIPE', module: 'MENU', description: `Updated recipe for menu ID: ${req.params.menuId}`, metadata: { menuId: req.params.menuId } });
+        await logActivity({ req, action: 'UPDATE_RECIPE', module: 'MENU', description: `Updated recipe for menu ID: ${targetMenuId}`, metadata: { menuId: targetMenuId } });
 
         res.json(item);
     } catch (err) {

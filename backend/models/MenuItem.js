@@ -21,4 +21,9 @@ const MenuItemSchema = new mongoose.Schema({
     // stock & hpp are calculated at runtime
 });
 
+// MenuItemSchema.pre('validate', function (next) {
+//     console.log('🔍 Validating MenuItem:', this);
+//     next();
+// });
+
 module.exports = mongoose.model('MenuItem', MenuItemSchema);

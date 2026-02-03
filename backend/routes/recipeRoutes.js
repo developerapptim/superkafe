@@ -7,13 +7,9 @@ router.use(checkApiKey);
 
 router.get('/', MenuController.getRecipes);
 router.put('/:menuId', MenuController.updateRecipe);
-router.post('/', MenuController.createMenu); // Sometimes createMenu is used for recipes? Checking server.js: app.post('/api/recipes') -> Recipe.findOneAndUpdate (upsert)
-// MenuController.updateRecipe logic (line 186) covers Upsert. 
-// server.js had both POST and PUT for recipes.
-// POST /api/recipes -> Recipe.findOneAndUpdate (upsert)
-// PUT /api/recipes/:menuId -> Recipe.findOneAndUpdate (upsert)
 
-router.post('/', MenuController.updateRecipe); // Reusing update as it handles upsert based on body
+// Fix: POST / should map to updateRecipe (which handles upsert), NOT createMenu
+router.post('/', MenuController.updateRecipe);
 // But MenuController.updateRecipe uses req.params.menuId?
 // Let's check MenuController.updateRecipe code:
 // const { ingredients } = req.body;

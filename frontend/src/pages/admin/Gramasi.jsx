@@ -430,6 +430,7 @@ function Gramasi() {
                                                 type="number"
                                                 value={ri.jumlah}
                                                 onChange={(e) => updateRecipeIngredient(index, 'jumlah', e.target.value)}
+                                                onFocus={(e) => e.target.select()}
                                                 className="w-24 px-3 py-2 rounded-lg bg-white/10 border border-purple-500/30 text-white text-right"
                                                 placeholder="Jumlah"
                                             />
