@@ -31,7 +31,6 @@ function AdminLayout() {
     const [showShiftModal, setShowShiftModal] = useState(false);
     const [shiftData, setShiftData] = useState({ startCash: '' });
     const { data: currentShift, mutate: mutateShift } = useSWR('/shifts/current', fetcher);
-    console.log('AdminLayout Shift:', currentShift);
 
     // Get User Role
     const user = JSON.parse(localStorage.getItem('user') || '{}');
@@ -39,8 +38,6 @@ function AdminLayout() {
 
     // Effects to check shift status
     useEffect(() => {
-        // If staff and no active shift (and data loaded), show modal
-        // Note: currentShift is null if no shift, but undefined if loading
         if (isStaff && currentShift === null) {
             setShowShiftModal(true);
         } else {
@@ -75,47 +72,42 @@ function AdminLayout() {
     return (
         <div
             id="adminPage"
-            className="relative h-screen overflow-hidden"
+            className="flex h-screen overflow-hidden bg-gray-900"
             ref={constraintsRef}
             style={{
                 background: 'linear-gradient(135deg, #1E1B4B 0%, #0F0A1F 50%, #1E1B4B 100%)',
             }}
         >
-            <div className="flex h-full">
-                {/* Sidebar */}
+            {/* Sidebar Wrapper */}
+            <div className="w-64 flex-shrink-0 h-full">
                 <Sidebar onLogout={handleLogout} />
-
-                {/* Main Content */}
-                <main
-                    className="flex-1 ml-12 lg:ml-64 overflow-auto text-white transition-all duration-300 relative"
-                    style={{ height: '100vh' }}
-                >
-
-
-                    <div className="p-2 md:p-6 pb-24">
-                        {/* Page Content - Rendered by Outlet */}
-                        <Outlet />
-                    </div>
-                </main>
-
-                <CommandPalette isOpen={showCmd} onClose={() => setShowCmd(false)} />
-
-                {/* Draggable Search FAB */}
-                <motion.button
-                    drag
-                    dragConstraints={constraintsRef}
-                    dragMomentum={false}
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
-                    onClick={() => setShowCmd(true)}
-                    className="fixed bottom-8 right-8 z-50 p-4 bg-blue-600 text-white rounded-full shadow-2xl shadow-blue-600/40 border-2 border-white/10 cursor-grab active:cursor-grabbing hover:bg-blue-500 transition-colors"
-                    title="Cari (Ctrl+K)"
-                >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                    </svg>
-                </motion.button>
             </div>
+
+            {/* Main Content */}
+            <main className="flex-1 overflow-y-auto p-4 content-container relative">
+                <div className="max-w-[1600px] mx-auto pb-24">
+                    <Outlet />
+                </div>
+            </main>
+
+            <CommandPalette isOpen={showCmd} onClose={() => setShowCmd(false)} />
+
+            {/* Draggable Search FAB */}
+            <motion.button
+                drag
+                dragConstraints={constraintsRef}
+                dragMomentum={false}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                onClick={() => setShowCmd(true)}
+                className="fixed bottom-8 right-8 z-50 p-4 bg-blue-600 text-white rounded-full shadow-2xl shadow-blue-600/40 border-2 border-white/10 cursor-grab active:cursor-grabbing hover:bg-blue-500 transition-colors"
+                title="Cari (Ctrl+K)"
+            >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+            </motion.button>
+
             {/* Blocking Shift Modal for Staff */}
             {showShiftModal && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">

@@ -1,13 +1,14 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+@import "tailwindcss";
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+
+:root {
+  font-family: 'Poppins', sans-serif;
 }
 
 body {
-  font-family: 'Poppins', sans-serif;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
   background: linear-gradient(135deg, #1E1B4B 0%, #0F0A1F 50%, #1E1B4B 100%);
   min-height: 100vh;
   color: white;
@@ -17,6 +18,7 @@ body {
   min-height: 100vh;
 }
 
+/* Custom Scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -38,67 +40,6 @@ body {
   border: 1px solid rgba(139, 92, 246, 0.2);
 }
 
-/* Modal overlay - ensures modals appear above sidebar on mobile */
-.modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.85);
-  backdrop-filter: blur(4px);
-  z-index: 10000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 1rem;
-}
-
-/* Modal content box */
-.modal-content {
-  background: rgba(30, 27, 75, 0.95);
-  border: 1px solid rgba(139, 92, 246, 0.3);
-  border-radius: 1rem;
-  max-height: 90vh;
-  max-width: 95vw;
-  width: 100%;
-  overflow: auto;
-  animation: scale-up 0.2s ease-out;
-}
-
-/* Primary button */
-.btn-primary {
-  background: linear-gradient(135deg, #6B21A8 0%, #1E40AF 100%);
-  color: white;
-  transition: all 0.3s ease;
-}
-
-.btn-primary:hover {
-  transform: scale(1.02);
-  box-shadow: 0 10px 30px rgba(107, 33, 168, 0.4);
-}
-
-/* Sidebar item */
-.sidebar-item {
-  transition: all 0.2s ease;
-}
-
-.sidebar-item:hover,
-.sidebar-item.active {
-  background: linear-gradient(90deg, rgba(107, 33, 168, 0.3) 0%, transparent 100%);
-  border-left: 3px solid #8B5CF6;
-}
-
-/* Input field */
-.input-field {
-  background: rgba(15, 10, 31, 0.6);
-  border: 1px solid rgba(139, 92, 246, 0.3);
-  transition: all 0.2s ease;
-}
-
-.input-field:focus {
-  border-color: #8B5CF6;
-  box-shadow: 0 0 20px rgba(139, 92, 246, 0.2);
-  outline: none;
-}
-
 /* Animations */
 @keyframes fadeIn {
   from {
@@ -114,54 +55,4 @@ body {
 
 .animate-fade {
   animation: fadeIn 0.3s ease-out;
-}
-
-.animate-pulse {
-  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-
-@keyframes pulse {
-
-  0%,
-  100% {
-    opacity: 1;
-  }
-
-  50% {
-    opacity: .5;
-  }
-}
-
-/* Slow pulse for new orders - subtle glow effect */
-@keyframes pulse-slow {
-
-  0%,
-  100% {
-    box-shadow: 0 0 20px -3px rgba(250, 204, 21, 0.5);
-  }
-
-  50% {
-    box-shadow: 0 0 30px -3px rgba(250, 204, 21, 0.8);
-  }
-}
-
-.animate-pulse-slow {
-  animation: pulse-slow 2s ease-in-out infinite;
-}
-
-/* Scale up animation for modals */
-@keyframes scale-up {
-  from {
-    opacity: 0;
-    transform: scale(0.9);
-  }
-
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-.animate-scale-up {
-  animation: scale-up 0.2s ease-out;
 }

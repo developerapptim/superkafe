@@ -7,9 +7,51 @@ const Shift = require('../models/Shift');
 const Customer = require('../models/Customer');
 const Settings = require('../models/Settings');
 
+exports.checkPhone = async (req, res) => {
+    try {
+        const { phone } = req.body;
+        const orders = await Order.find({
+            customerPhone: phone,
+            status: { $in: ['new', 'process'] }
+        });
+
+        if (orders.length > 0) {
+            res.json({
+                hasActiveOrder: true,
+                orders: orders.map(o => ({
+                    id: o.id,
+                    total: o.total,
+                    itemCount: o.items.length,
+                    time: new Date(o.timestamp).toLocaleTimeString(),
+                    tableNumber: o.tableNumber
+                }))
+            });
+        } else {
+            res.json({ hasActiveOrder: false });
+        }
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Server error' });
+    }
+};
+
 exports.createOrder = async (req, res) => {
     try {
-        const orderData = req.body;
+        let orderData = req.body;
+
+        // PARSE IF STRING (Multer stores non-file fields as strings in req.body)
+        if (req.body.orderData && typeof req.body.orderData === 'string') {
+            try {
+                orderData = JSON.parse(req.body.orderData);
+            } catch (err) {
+                return res.status(400).json({ error: 'Invalid order data format' });
+            }
+        }
+
+        // Attach Payment Proof if uploaded
+        if (req.file) {
+            orderData.paymentProofImage = `/uploads/payments/${req.file.filename}`;
+        }
 
         // 1. Calculate HPP & Deduct Stock
         // We need to fetch Recipes and Ingredients

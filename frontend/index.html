@@ -6,75 +6,10 @@
   <link rel="icon" type="image/svg+xml" href="/vite.svg" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Warkop Admin Panel</title>
-  <!-- Tailwind CSS CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            primary: '#6B21A8',
-            secondary: '#1E40AF',
-            surface: '#1E1B4B',
-          }
-        }
-      }
-    }
-  </script>
+
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
 
-    body {
-      font-family: 'Poppins', sans-serif;
-      background: linear-gradient(135deg, #1E1B4B 0%, #0F0A1F 50%, #1E1B4B 100%);
-      min-height: 100vh;
-      color: white;
-    }
-
-    #root {
-      min-height: 100vh;
-    }
-
-    ::-webkit-scrollbar {
-      width: 6px;
-      height: 6px;
-    }
-
-    ::-webkit-scrollbar-track {
-      background: #1E1B4B;
-    }
-
-    ::-webkit-scrollbar-thumb {
-      background: #6B21A8;
-      border-radius: 3px;
-    }
-
-    .glass {
-      background: rgba(30, 27, 75, 0.8);
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(139, 92, 246, 0.2);
-    }
-
-    .sidebar-item {
-      transition: all 0.2s ease;
-    }
-
-    .sidebar-item:hover,
-    .sidebar-item.active {
-      background: linear-gradient(90deg, rgba(107, 33, 168, 0.3) 0%, transparent 100%);
-      border-left: 3px solid #8B5CF6;
-    }
-
-    .btn-primary {
-      background: linear-gradient(135deg, #6B21A8 0%, #1E40AF 100%);
-    }
-  </style>
 </head>
 
 <body>

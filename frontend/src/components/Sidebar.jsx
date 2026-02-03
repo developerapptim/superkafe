@@ -113,7 +113,7 @@ function Sidebar({ onLogout }) {
   return (
     <aside
       id="sidebar"
-      className="fixed top-0 left-0 h-full w-12 lg:w-64 bg-[#1E1B4B]/95 backdrop-blur-xl border-r border-purple-500/20 z-40 flex flex-col transition-all duration-300 shadow-2xl"
+      className="h-full w-full bg-[#1E1B4B]/95 backdrop-blur-xl border-r border-purple-500/20 flex flex-col transition-all duration-300 shadow-2xl"
     >
       {/* Header */}
       <div className="h-16 flex items-center justify-center lg:justify-start px-2 lg:px-4 border-b border-purple-500/30 bg-[#151235]">

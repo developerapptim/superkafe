@@ -8,9 +8,10 @@ const { uploadPayment } = require('../middleware/uploadMiddleware');
 
 router.get('/', checkApiKey, OrderController.getOrders);
 router.get('/:id', checkApiKey, OrderController.getOrderById); // New
-router.post('/', uploadPayment.single('paymentProof'), OrderController.createOrder); // Public for self-order? usually protected. Let's protect it or keep as is. server.js had it protected via logic? server.js usually allowed it. But let's checkApiKey for safety or make it public if it's for customer app. 
-// Wait, customer app creates orders freely? usually yes. But let's assume it needs API Key "warkop_secret_123" which frontend has.
-// So checkApiKey is fine.
+// Public-ish endpoint (secured by API Key) to check existing orders
+router.post('/check-phone', checkApiKey, OrderController.checkPhone);
+
+router.post('/', uploadPayment.single('paymentProof'), OrderController.createOrder);
 
 router.patch('/:id/status', checkApiKey, OrderController.updateOrderStatus);
 

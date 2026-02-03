@@ -53,29 +53,29 @@ function Login() {
             <div className="absolute top-0 left-0 w-96 h-96 bg-purple-600/20 rounded-full blur-[100px] -translate-x-1/2 -translate-y-1/2"></div>
             <div className="absolute bottom-0 right-0 w-96 h-96 bg-blue-600/20 rounded-full blur-[100px] translate-x-1/2 translate-y-1/2"></div>
 
-            <div className="glass rounded-2xl p-8 w-full max-w-md relative z-10 border border-purple-500/20 shadow-2xl backdrop-blur-xl bg-[#1E1B4B]/60">
+            <div className="glass rounded-2xl p-8 md:p-10 w-full max-w-lg relative z-10 border border-purple-500/30 shadow-2xl backdrop-blur-xl bg-[#1E1B4B]/70">
                 <div className="text-center mb-8">
-                    <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-purple-600 to-blue-600 mx-auto flex items-center justify-center mb-4 shadow-lg shadow-purple-500/20">
-                        <svg className="w-10 h-10 text-white" fill="currentColor" viewBox="0 0 24 24">
+                    <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-purple-600 to-blue-600 mx-auto flex items-center justify-center mb-6 shadow-lg shadow-purple-500/20 transform hover:scale-105 transition-transform duration-300">
+                        <svg className="w-12 h-12 text-white" fill="currentColor" viewBox="0 0 24 24">
                             <path d="M2,21H20V19H2M20,8H18V5H20M20,3H4V13A4,4 0 0,0 8,17H14A4,4 0 0,0 18,13V10H20A2,2 0 0,0 22,8V5C22,3.89 21.1,3 20,3Z" />
                         </svg>
                     </div>
-                    <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent mb-1">
+                    <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent mb-2">
                         Warkop Santai
                     </h1>
-                    <p className="text-gray-400 text-sm">Sistem Manajemen Warkop Modern</p>
+                    <p className="text-gray-300 text-base">Sistem Manajemen Warkop Modern</p>
                 </div>
 
-                <form onSubmit={handleLogin} className="space-y-5">
+                <form onSubmit={handleLogin} className="space-y-6">
                     <div>
-                        <label className="block text-sm text-gray-400 mb-2 ml-1">Username</label>
-                        <div className="relative">
-                            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">👤</span>
+                        <label className="block text-sm font-medium text-gray-300 mb-2 ml-1">Username</label>
+                        <div className="relative group">
+                            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-purple-400 transition-colors">👤</span>
                             <input
                                 type="text"
                                 value={username}
                                 onChange={(e) => setUsername(e.target.value)}
-                                className="w-full pl-11 pr-4 py-3 rounded-xl bg-black/20 border border-purple-500/30 text-white placeholder-gray-600 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all"
+                                className="w-full pl-11 pr-4 py-3.5 rounded-xl bg-black/40 border border-purple-500/30 text-white placeholder-gray-500 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all shadow-inner"
                                 placeholder="Masukkan username"
                                 autoFocus
                             />
@@ -83,14 +83,14 @@ function Login() {
                     </div>
 
                     <div>
-                        <label className="block text-sm text-gray-400 mb-2 ml-1">Password / PIN</label>
-                        <div className="relative">
-                            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500">🔒</span>
+                        <label className="block text-sm font-medium text-gray-300 mb-2 ml-1">Password / PIN</label>
+                        <div className="relative group">
+                            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-purple-400 transition-colors">🔒</span>
                             <input
                                 type="password"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
-                                className="w-full pl-11 pr-4 py-3 rounded-xl bg-black/20 border border-purple-500/30 text-white placeholder-gray-600 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all"
+                                className="w-full pl-11 pr-4 py-3.5 rounded-xl bg-black/40 border border-purple-500/30 text-white placeholder-gray-500 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all shadow-inner"
                                 placeholder="******"
                             />
                         </div>
@@ -99,7 +99,7 @@ function Login() {
                     <button
                         type="submit"
                         disabled={isLoading}
-                        className="w-full py-3.5 rounded-xl font-bold text-white bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 shadow-lg shadow-purple-900/40 transform hover:-translate-y-0.5 transition-all disabled:opacity-50 disabled:cursor-not-allowed mt-4"
+                        className="w-full py-4 rounded-xl font-bold text-white text-lg bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 shadow-lg shadow-purple-900/40 transform hover:-translate-y-0.5 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed mt-6"
                     >
                         {isLoading ? (
                             <div className="flex items-center justify-center gap-2">
@@ -112,13 +112,13 @@ function Login() {
                     </button>
                 </form>
 
-                <div className="mt-8 pt-6 border-t border-white/5 text-center">
-                    <p className="text-xs text-gray-500">
+                <div className="mt-8 pt-6 border-t border-white/10 text-center">
+                    <p className="text-xs text-gray-400">
                         Belum punya akun? Hubungi Administrator
                     </p>
-                    <div className="mt-4 flex flex-wrap justify-center gap-2 text-[10px] text-gray-600 bg-black/20 p-2 rounded-lg">
-                        <span className="bg-purple-900/30 text-purple-400 px-2 py-1 rounded">Admin: password</span>
-                        <span className="bg-blue-900/30 text-blue-400 px-2 py-1 rounded">Kasir: 123456</span>
+                    <div className="mt-4 flex flex-wrap justify-center gap-2 text-[10px] text-gray-400 bg-black/30 p-2 rounded-lg border border-white/5">
+                        <span className="bg-purple-900/40 text-purple-300 px-2 py-1 rounded">Admin: password</span>
+                        <span className="bg-blue-900/40 text-blue-300 px-2 py-1 rounded">Kasir: 123456</span>
                     </div>
                 </div>
             </div>
