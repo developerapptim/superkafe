@@ -226,7 +226,7 @@ function Pengaturan() {
                                 type="tel"
                                 value={settings.phone}
                                 onChange={(e) => setSettings({ ...settings, phone: e.target.value })}
-                                className="flex-1 px-4 py-2 rounded-lg bg-white/5 border border-purple-500/30 text-white"
+                                className="flex-1 w-full min-w-0 px-4 py-2 rounded-lg bg-white/5 border border-purple-500/30 text-white"
                                 placeholder="81234567890"
                             />
                         </div>

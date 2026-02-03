@@ -116,41 +116,41 @@ function Dashboard() {
             {/* Stats Cards */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
                 {/* Revenue Card */}
-                <div className="glass rounded-xl p-4 hover:transform hover:-translate-y-1 transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/20">
+                <div className="glass rounded-xl p-3 md:p-4 hover:transform hover:-translate-y-1 transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/20">
                     <div className="flex items-center justify-between mb-2">
-                        <span className="text-2xl">💰</span>
-                        <span className="text-xs text-green-400 bg-green-500/20 px-2 py-1 rounded-full">{stats.revenueChange}</span>
+                        <span className="text-xl md:text-2xl">💰</span>
+                        <span className="text-[10px] md:text-xs text-green-400 bg-green-500/20 px-2 py-1 rounded-full">{stats.revenueChange}</span>
                     </div>
-                    <p className="text-2xl font-bold">{stats.revenue}</p>
-                    <p className="text-xs text-gray-400">Pendapatan Hari Ini</p>
+                    <p className="text-lg md:text-2xl font-bold truncate">{stats.revenue}</p>
+                    <p className="text-[10px] md:text-xs text-gray-400">Pendapatan Hari Ini</p>
                 </div>
 
                 {/* Orders Card */}
-                <div className="glass rounded-xl p-4 hover:transform hover:-translate-y-1 transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/20">
+                <div className="glass rounded-xl p-3 md:p-4 hover:transform hover:-translate-y-1 transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/20">
                     <div className="flex items-center justify-between mb-2">
-                        <span className="text-2xl">📋</span>
-                        <span className="text-xs text-blue-400 bg-blue-500/20 px-2 py-1 rounded-full">Live</span>
+                        <span className="text-xl md:text-2xl">📋</span>
+                        <span className="text-[10px] md:text-xs text-blue-400 bg-blue-500/20 px-2 py-1 rounded-full">Live</span>
                     </div>
-                    <p className="text-2xl font-bold">{stats.orders}</p>
-                    <p className="text-xs text-gray-400">Total Pesanan</p>
+                    <p className="text-lg md:text-2xl font-bold">{stats.orders}</p>
+                    <p className="text-[10px] md:text-xs text-gray-400">Total Pesanan</p>
                 </div>
 
                 {/* Tables Card */}
-                <div className="glass rounded-xl p-4 hover:transform hover:-translate-y-1 transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/20">
+                <div className="glass rounded-xl p-3 md:p-4 hover:transform hover:-translate-y-1 transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/20">
                     <div className="flex items-center justify-between mb-2">
-                        <span className="text-2xl">🪑</span>
+                        <span className="text-xl md:text-2xl">🪑</span>
                     </div>
-                    <p className="text-2xl font-bold">{stats.tables}</p>
-                    <p className="text-xs text-gray-400">Meja Terisi</p>
+                    <p className="text-lg md:text-2xl font-bold">{stats.tables}</p>
+                    <p className="text-[10px] md:text-xs text-gray-400">Meja Terisi</p>
                 </div>
 
                 {/* Customers Card */}
-                <div className="glass rounded-xl p-4 hover:transform hover:-translate-y-1 transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/20">
+                <div className="glass rounded-xl p-3 md:p-4 hover:transform hover:-translate-y-1 transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/20">
                     <div className="flex items-center justify-between mb-2">
-                        <span className="text-2xl">👥</span>
+                        <span className="text-xl md:text-2xl">👥</span>
                     </div>
-                    <p className="text-2xl font-bold">{stats.customers}</p>
-                    <p className="text-xs text-gray-400">Pelanggan</p>
+                    <p className="text-lg md:text-2xl font-bold">{stats.customers}</p>
+                    <p className="text-[10px] md:text-xs text-gray-400">Pelanggan</p>
                 </div>
             </div>
 

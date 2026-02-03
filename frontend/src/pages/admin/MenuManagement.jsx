@@ -415,10 +415,10 @@ function MenuManagement() {
                         <span>➕</span> Tambah
                     </button>
                 </div>
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2 md:gap-3">
                     <button
                         onClick={() => setSelectedCategory('all')}
-                        className={`relative p-3 rounded-xl text-left border transition-all flex items-center justify-between group overflow-hidden ${selectedCategory === 'all'
+                        className={`relative p-2 md:p-3 rounded-xl text-left border transition-all flex items-center justify-between group overflow-hidden ${selectedCategory === 'all'
                             ? 'border-purple-500 text-white'
                             : 'border-transparent hover:bg-white/10'
                             }`}
@@ -429,11 +429,11 @@ function MenuManagement() {
                                 className="absolute inset-0 bg-gradient-to-br from-purple-500/20 to-blue-500/20 -z-10"
                             />
                         )}
-                        <div className="z-10">
-                            <span className="font-bold block text-sm">Semua</span>
-                            <span className="text-[10px] text-gray-400">{menuItems.length} Menu</span>
+                        <div className="z-10 min-w-0">
+                            <span className="font-bold block text-xs md:text-sm truncate">Semua</span>
+                            <span className="text-[10px] text-gray-400 truncate">{menuItems.length} Menu</span>
                         </div>
-                        <span className="text-lg opacity-50 group-hover:opacity-100 transition-opacity z-10">🍽️</span>
+                        <span className="text-sm md:text-lg opacity-50 group-hover:opacity-100 transition-opacity z-10 shrink-0">🍽️</span>
                     </button>
                     {categories.map(cat => {
                         const count = menuItems.filter(m => m.category === cat.id).length;
@@ -442,7 +442,7 @@ function MenuManagement() {
                             <div
                                 key={cat.id}
                                 onClick={() => setSelectedCategory(cat.id)}
-                                className={`relative group p-3 rounded-xl border transition-all flex items-center justify-between cursor-pointer overflow-hidden ${isSelected
+                                className={`relative group p-2 md:p-3 rounded-xl border transition-all flex items-center justify-between cursor-pointer overflow-hidden ${isSelected
                                     ? 'border-purple-500 text-white'
                                     : 'border-white/5 hover:bg-white/10'
                                     }`}
@@ -453,14 +453,14 @@ function MenuManagement() {
                                         className="absolute inset-0 bg-gradient-to-br from-purple-500/20 to-blue-500/20 -z-10"
                                     />
                                 )}
-                                <div className="min-w-0 pr-2 z-10">
-                                    <span className="font-bold block truncate text-sm">{cat.name}</span>
-                                    <span className="text-[10px] text-gray-400">{count} Menu</span>
+                                <div className="min-w-0 pr-1 flex-1">
+                                    <span className="font-bold block truncate text-xs md:text-sm" title={cat.name}>{cat.name}</span>
+                                    <span className="text-[10px] text-gray-400 truncate">{count} Menu</span>
                                 </div>
                                 <div className="flex gap-1 shrink-0 z-10" onClick={(e) => e.stopPropagation()}>
                                     <button
                                         onClick={(e) => { e.stopPropagation(); openEditCategoryModal(cat); }}
-                                        className="w-7 h-7 rounded-full bg-white/10 hover:bg-blue-500/20 text-gray-400 hover:text-blue-400 flex items-center justify-center transition-colors"
+                                        className="w-6 h-6 md:w-7 md:h-7 rounded-full bg-white/10 hover:bg-blue-500/20 text-gray-400 hover:text-blue-400 flex items-center justify-center transition-colors"
                                         title="Edit"
                                         style={{ display: 'flex' }}
                                     >
@@ -468,7 +468,7 @@ function MenuManagement() {
                                     </button>
                                     <button
                                         onClick={(e) => { e.stopPropagation(); handleDeleteCategory(cat); }}
-                                        className="w-7 h-7 rounded-full bg-white/10 hover:bg-red-500/20 text-gray-400 hover:text-red-400 flex items-center justify-center transition-colors"
+                                        className="w-6 h-6 md:w-7 md:h-7 rounded-full bg-white/10 hover:bg-red-500/20 text-gray-400 hover:text-red-400 flex items-center justify-center transition-colors"
                                         title="Hapus"
                                         style={{ display: 'flex' }}
                                     >

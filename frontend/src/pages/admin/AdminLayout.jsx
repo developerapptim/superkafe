@@ -79,7 +79,7 @@ function AdminLayout() {
             }}
         >
             {/* Sidebar Wrapper */}
-            <div className="w-64 flex-shrink-0 h-full">
+            <div className="w-20 lg:w-64 flex-shrink-0 h-full transition-all duration-300">
                 <Sidebar onLogout={handleLogout} />
             </div>
 

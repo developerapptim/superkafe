@@ -204,16 +204,16 @@ function Keuangan() {
             </div>
 
             {/* Tabs */}
-            <div className="flex gap-2 border-b border-purple-500/30 pb-1">
+            <div className="grid grid-cols-3 gap-1 border-b border-purple-500/30 pb-1">
                 {[
                     { id: 'ringkasan', label: '📊 Ringkasan' },
                     { id: 'transaksi', label: '📋 Transaksi' },
-                    { id: 'hutang', label: '📒 Buku Hutang' }
+                    { id: 'hutang', label: '📒 Hutang' }
                 ].map(tab => (
                     <button
                         key={tab.id}
                         onClick={() => setActiveTab(tab.id)}
-                        className={`px-4 py-2 rounded-t-lg transition-colors font-medium ${activeTab === tab.id
+                        className={`px-1 py-2 md:px-4 rounded-t-lg transition-colors font-medium text-xs md:text-sm truncate ${activeTab === tab.id
                             ? 'bg-purple-600 text-white'
                             : 'bg-transparent text-gray-400 hover:text-white hover:bg-white/5'
                             }`}
@@ -227,49 +227,49 @@ function Keuangan() {
             {activeTab === 'ringkasan' && (
                 <div className="space-y-6">
                     {/* Main Profit Card */}
-                    <div className={`glass rounded-xl p-6 border-2 ${analytics.netProfit >= 0 ? 'border-green-500/50 bg-green-500/5' : 'border-red-500/50 bg-red-500/5'}`}>
+                    <div className={`glass rounded-xl p-4 md:p-6 border-2 ${analytics.netProfit >= 0 ? 'border-green-500/50 bg-green-500/5' : 'border-red-500/50 bg-red-500/5'}`}>
                         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                             <div>
-                                <p className="text-sm text-gray-400 mb-1">📈 Estimasi Laba Bersih</p>
-                                <p className={`text-4xl font-bold ${analytics.netProfit >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                                <p className="text-xs md:text-sm text-gray-400 mb-1">📈 Estimasi Laba Bersih</p>
+                                <p className={`text-2xl md:text-4xl font-bold break-all ${analytics.netProfit >= 0 ? 'text-green-400' : 'text-red-400'}`}>
                                     {formatCurrency(analytics.netProfit)}
                                 </p>
-                                <p className="text-xs text-gray-500 mt-2">= Penjualan - HPP - Biaya Operasional</p>
+                                <p className="text-[10px] md:text-xs text-gray-500 mt-2">= Penjualan - HPP - Biaya Operasional</p>
                             </div>
-                            <div className="text-right text-sm space-y-1">
-                                <p><span className="text-gray-500">Laba Kotor:</span> <span className="text-teal-400 font-medium">{formatCurrency(analytics.grossProfit || 0)}</span></p>
-                                <p className="text-xs text-gray-500">(Penjualan - HPP)</p>
+                            <div className="text-left md:text-right text-xs md:text-sm space-y-1 border-t border-white/5 pt-2 md:border-0 md:pt-0">
+                                <p><span className="text-gray-500 mr-2 md:mr-0">Laba Kotor:</span> <span className="text-teal-400 font-medium">{formatCurrency(analytics.grossProfit || 0)}</span></p>
+                                <p className="text-[10px] md:text-xs text-gray-500">(Penjualan - HPP)</p>
                             </div>
                         </div>
                     </div>
 
                     {/* Income/Expense Breakdown */}
-                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
                         {/* Total Penjualan */}
-                        <div className="glass rounded-xl p-5">
-                            <p className="text-xs text-gray-500 mb-1">� Total Penjualan</p>
-                            <p className="text-xl font-bold text-green-400">{formatCurrency(analytics.totalSales || 0)}</p>
+                        <div className="glass rounded-xl p-3 md:p-5">
+                            <p className="text-[10px] md:text-xs text-gray-500 mb-1">💰 Total Penjualan</p>
+                            <p className="text-lg md:text-xl font-bold text-green-400 truncate">{formatCurrency(analytics.totalSales || 0)}</p>
                         </div>
 
                         {/* HPP */}
-                        <div className="glass rounded-xl p-5 border border-orange-500/30">
-                            <p className="text-xs text-gray-500 mb-1">🏭 HPP (Modal Bahan)</p>
-                            <p className="text-xl font-bold text-orange-400">{formatCurrency(analytics.totalHPP || 0)}</p>
+                        <div className="glass rounded-xl p-3 md:p-5 border border-orange-500/30">
+                            <p className="text-[10px] md:text-xs text-gray-500 mb-1">🏭 HPP (Modal Bahan)</p>
+                            <p className="text-lg md:text-xl font-bold text-orange-400 truncate">{formatCurrency(analytics.totalHPP || 0)}</p>
                         </div>
 
                         {/* Biaya Operasional */}
-                        <div className="glass rounded-xl p-5">
-                            <p className="text-xs text-gray-500 mb-1">📤 Biaya Operasional</p>
-                            <p className="text-xl font-bold text-red-400">{formatCurrency(analytics.totalOperationalExpense || 0)}</p>
+                        <div className="glass rounded-xl p-3 md:p-5">
+                            <p className="text-[10px] md:text-xs text-gray-500 mb-1">📤 Biaya Operasional</p>
+                            <p className="text-lg md:text-xl font-bold text-red-400 truncate">{formatCurrency(analytics.totalOperationalExpense || 0)}</p>
                         </div>
 
                         {/* Hutang Belum Lunas */}
-                        <div className="glass rounded-xl p-5 border border-yellow-500/30">
-                            <p className="text-xs text-gray-500 mb-1">⚠️ Hutang Aktif</p>
-                            <p className="text-xl font-bold text-yellow-400">
+                        <div className="glass rounded-xl p-3 md:p-5 border border-yellow-500/30">
+                            <p className="text-[10px] md:text-xs text-gray-500 mb-1">⚠️ Hutang Aktif</p>
+                            <p className="text-lg md:text-xl font-bold text-yellow-400 truncate">
                                 {formatCurrency(breakdown.totalKasbon + breakdown.totalPiutang)}
                             </p>
-                            <p className="text-xs text-gray-600 mt-1">
+                            <p className="text-[10px] md:text-xs text-gray-600 mt-1 truncate">
                                 Kasbon: {formatCurrency(breakdown.totalKasbon)}
                             </p>
                         </div>

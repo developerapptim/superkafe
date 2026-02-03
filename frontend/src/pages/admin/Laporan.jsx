@@ -85,25 +85,25 @@ function Laporan() {
             ) : (
                 <>
                     {/* Report Cards */}
-                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                        <div className="glass rounded-xl p-4">
-                            <p className="text-xs text-gray-400">Total Pendapatan</p>
-                            <p className="text-xl font-bold text-green-400">{formatCurrency(stats.revenue)}</p>
+                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
+                        <div className="glass rounded-xl p-3 md:p-4 border-l-4 border-green-500">
+                            <p className="text-[10px] md:text-xs text-gray-400">Total Pendapatan</p>
+                            <p className="text-lg md:text-xl font-bold truncate">{formatCurrency(stats.revenue)}</p>
                         </div>
-                        <div className="glass rounded-xl p-4">
-                            <p className="text-xs text-gray-400">Total Pesanan</p>
-                            <p className="text-xl font-bold text-blue-400">{stats.orders}</p>
+                        <div className="glass rounded-xl p-3 md:p-4 border-l-4 border-blue-500">
+                            <p className="text-[10px] md:text-xs text-gray-400">Total Pesanan</p>
+                            <p className="text-lg md:text-xl font-bold">{stats.orders}</p>
                         </div>
-                        <div className="glass rounded-xl p-4">
-                            <p className="text-xs text-gray-400">Rata-rata Transaksi</p>
-                            <p className="text-xl font-bold text-purple-400">{formatCurrency(stats.avgOrderValue)}</p>
+                        <div className="glass rounded-xl p-3 md:p-4 border-l-4 border-purple-500">
+                            <p className="text-[10px] md:text-xs text-gray-400">Rata-rata Transaksi</p>
+                            <p className="text-lg md:text-xl font-bold truncate">{formatCurrency(stats.avgOrderValue)}</p>
                         </div>
-                        <div className="glass rounded-xl p-4">
-                            <p className="text-xs text-gray-400">Pertumbuhan Omzet</p>
-                            <p className={`text-xl font-bold ${stats.growthRate >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                        <div className="glass rounded-xl p-3 md:p-4 border-l-4 border-yellow-500">
+                            <p className="text-[10px] md:text-xs text-gray-400">Pertumbuhan Omzet</p>
+                            <p className={`text-lg md:text-xl font-bold ${stats.growthRate >= 0 ? 'text-green-400' : 'text-red-400'}`}>
                                 {stats.growthRate > 0 ? '+' : ''}{stats.growthRate.toFixed(1)}%
                             </p>
-                            <p className="text-xs text-gray-500">vs periode sebelumnya</p>
+                            <p className="text-[10px] md:text-xs text-gray-500">vs periode sebelumnya</p>
                         </div>
                     </div>
 
@@ -141,7 +141,7 @@ function Laporan() {
                     </div>
 
                     {/* Charts Row 1: Menu Analysis */}
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                         {/* Top Menu */}
                         <div className="glass rounded-xl p-4">
                             <h3 className="font-bold mb-4">🏆 Menu Terlaris</h3>
@@ -261,7 +261,7 @@ function Laporan() {
                     </div>
 
                     {/* Charts Row 2: Peak Hours & Payment Pie */}
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                         {/* Peak Hours */}
                         <div className="glass rounded-xl p-4">
                             <h3 className="font-bold mb-4">⏰ Jam Ramai</h3>
@@ -282,7 +282,7 @@ function Laporan() {
                         {/* Payment Pie Chart */}
                         <div className="glass rounded-xl p-4">
                             <h3 className="font-bold mb-4">💳 Metode Pembayaran</h3>
-                            <div className="flex items-center justify-center gap-8">
+                            <div className="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-8">
                                 {/* Simple CSS Pie Chart */}
                                 <div
                                     className="w-32 h-32 rounded-full relative"
@@ -298,7 +298,7 @@ function Laporan() {
                                     </div>
                                 </div>
                                 {/* Legend */}
-                                <div className="space-y-3">
+                                <div className="space-y-3 w-full md:w-auto">
                                     <div className="flex items-center gap-2">
                                         <div className="w-4 h-4 rounded bg-green-500"></div>
                                         <span className="text-sm">Cash ({paymentStats.cashPercent}%)</span>

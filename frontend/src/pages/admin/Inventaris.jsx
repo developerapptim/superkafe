@@ -560,17 +560,17 @@ function Inventaris() {
             {/* Header */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <h2 className="text-2xl font-bold">📦 Inventaris</h2>
-                <div className="flex gap-2 w-full md:w-auto">
+                <div className="flex flex-col md:flex-row gap-2 w-full md:w-auto">
                     <button
                         onClick={() => setShowUnitsModal(true)}
-                        className="flex-1 md:flex-none bg-white/10 hover:bg-white/20 px-4 py-2 rounded-lg text-sm font-medium flex items-center justify-center gap-2 transition-all whitespace-nowrap"
+                        className="w-full md:w-auto bg-white/10 hover:bg-white/20 px-4 py-2 rounded-lg text-sm font-medium flex items-center justify-center gap-2 transition-all whitespace-nowrap"
                     >
                         <span>📏</span> Kelola Satuan
                     </button>
                     {canEdit && (
                         <button
                             onClick={openAddModal}
-                            className="flex-1 md:flex-none bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 px-4 py-2 rounded-lg text-sm font-medium flex items-center justify-center gap-2 transition-all whitespace-nowrap"
+                            className="w-full md:w-auto bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 px-4 py-2 rounded-lg text-sm font-medium flex items-center justify-center gap-2 transition-all whitespace-nowrap"
                         >
                             <span>➕</span> Tambah Bahan
                         </button>
@@ -579,24 +579,24 @@ function Inventaris() {
             </div>
 
             {/* Stats Cards - Hide financial cards for Staf */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                <div className="glass rounded-xl p-4">
-                    <p className="text-xs text-gray-400">Total Bahan</p>
-                    <p className="text-xl font-bold">{stats.totalItems}</p>
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
+                <div className="glass rounded-xl p-3 md:p-4">
+                    <p className="text-[10px] md:text-xs text-gray-400">Total Bahan</p>
+                    <p className="text-lg md:text-xl font-bold">{stats.totalItems}</p>
                 </div>
-                <div className="glass rounded-xl p-4">
-                    <p className="text-xs text-gray-400">Stok Rendah</p>
-                    <p className="text-xl font-bold text-red-400">{stats.lowStock}</p>
+                <div className="glass rounded-xl p-3 md:p-4">
+                    <p className="text-[10px] md:text-xs text-gray-400">Stok Rendah</p>
+                    <p className="text-lg md:text-xl font-bold text-red-400">{stats.lowStock}</p>
                 </div>
                 {isAdmin && (
                     <>
-                        <div className="glass rounded-xl p-4">
-                            <p className="text-xs text-gray-400">Nilai Aset Stok</p>
-                            <p className="text-xl font-bold text-green-400">{formatCurrency(stats.assetValue)}</p>
+                        <div className="glass rounded-xl p-3 md:p-4">
+                            <p className="text-[10px] md:text-xs text-gray-400">Nilai Aset Stok</p>
+                            <p className="text-lg md:text-xl font-bold text-green-400 truncate">{formatCurrency(stats.assetValue)}</p>
                         </div>
-                        <div className="glass rounded-xl p-4">
-                            <p className="text-xs text-gray-400">Nilai + PPN</p>
-                            <p className="text-xl font-bold text-purple-400">{formatCurrency(stats.assetWithPPN)}</p>
+                        <div className="glass rounded-xl p-3 md:p-4">
+                            <p className="text-[10px] md:text-xs text-gray-400">Nilai + PPN</p>
+                            <p className="text-lg md:text-xl font-bold text-purple-400 truncate">{formatCurrency(stats.assetWithPPN)}</p>
                         </div>
                     </>
                 )}
