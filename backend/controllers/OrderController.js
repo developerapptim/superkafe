@@ -85,7 +85,19 @@ exports.createOrder = async (req, res) => {
                     for (const ri of recipeIngredients) {
                         const ingKey = String(ri.ing_id);
                         const ingData = ingredientMap.get(ingKey);
-                        const required = Number(ri.jumlah || 0);
+
+                        // SANITIZE & VALIDATE NUMBERS
+                        let required = Number(ri.jumlah);
+                        if (isNaN(required)) {
+                            console.warn(`⚠️ Invalid Recipe Amount for ingredient ${ri.ing_id}: ${ri.jumlah}, defaulting to 0`);
+                            required = 0;
+                        }
+
+                        let qtyOrdered = Number(item.qty || item.count);
+                        if (isNaN(qtyOrdered)) {
+                            console.warn(`⚠️ Invalid Order Qty for item ${item.name}: ${item.qty || item.count}, defaulting to 0`);
+                            qtyOrdered = 0;
+                        }
 
                         if (ingData) {
                             // Calculate HPP
@@ -93,37 +105,52 @@ exports.createOrder = async (req, res) => {
                                 ? (ingData.harga_beli / ingData.isi_prod)
                                 : ingData.harga_beli;
 
-                            itemHPP += (costPerUnit * required);
+                            // Safe check for costPerUnit
+                            const validCost = isNaN(costPerUnit) ? 0 : costPerUnit;
+
+                            itemHPP += (validCost * required);
 
                             // DEDUCT STOCK
                             if (ingData.type === 'physical' || !ingData.type) {
-                                const qtyOrdered = Number(item.qty || item.count || 0);
                                 const qtyToDeduct = required * qtyOrdered;
 
-                                ingData.stok -= qtyToDeduct;
-                                await ingData.save();
+                                console.log(`📉 Deducting Stock: ${ingData.nama} (ID: ${ingData.id}) | Current: ${ingData.stok} | Deduct: ${qtyToDeduct}`);
 
-                                // Log Stock History
-                                const history = new StockHistory({
-                                    id: `hist_out_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`,
-                                    ing_id: ingData.id,
-                                    ingName: ingData.nama,
-                                    type: 'out',
-                                    qty: qtyToDeduct,
-                                    stokSebelum: ingData.stok + qtyToDeduct,
-                                    stokSesudah: ingData.stok,
-                                    note: `Order ${orderData.id} - ${item.name}`,
-                                    date: new Date().toISOString().split('T')[0],
-                                    time: new Date().toLocaleTimeString('id-ID', { hour12: false })
-                                });
-                                await history.save();
+                                if (isNaN(ingData.stok)) {
+                                    console.error(`⚠️ Stock corrupted (NaN) for ${ingData.nama}, resetting to 0`);
+                                    ingData.stok = 0;
+                                }
+
+                                if (!isNaN(qtyToDeduct)) {
+                                    ingData.stok -= qtyToDeduct;
+                                    await ingData.save();
+
+                                    // Log Stock History
+                                    const history = new StockHistory({
+                                        id: `hist_out_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`,
+                                        ing_id: ingData.id,
+                                        ingName: ingData.nama,
+                                        type: 'out',
+                                        qty: qtyToDeduct,
+                                        stokSebelum: ingData.stok + qtyToDeduct,
+                                        stokSesudah: ingData.stok,
+                                        note: `Order ${orderData.id} - ${item.name}`,
+                                        date: new Date().toISOString().split('T')[0],
+                                        time: new Date().toLocaleTimeString('id-ID', { hour12: false })
+                                    });
+                                    await history.save();
+                                } else {
+                                    console.error(`❌ Validation Failed: qtyToDeduct is NaN for ${ingData.nama}`);
+                                }
                             }
                         }
                     }
                 }
 
-                const qtyOrdered = Number(item.qty || item.count || 0);
-                orderTotalHPP += (itemHPP * qtyOrdered);
+                const qtyOrderedFinal = Number(item.qty || item.count);
+                const safeQty = isNaN(qtyOrderedFinal) ? 0 : qtyOrderedFinal;
+
+                orderTotalHPP += (itemHPP * safeQty);
 
                 enrichedItems.push({
                     ...item,
