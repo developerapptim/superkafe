@@ -37,24 +37,32 @@ exports.checkPhone = async (req, res) => {
 
 exports.createOrder = async (req, res) => {
     try {
+        console.log("➡️ Create Order Request Received");
         let orderData = req.body;
 
-        // PARSE IF STRING (Multer stores non-file fields as strings in req.body)
+        // PARSE IF STRING
         if (req.body.orderData && typeof req.body.orderData === 'string') {
             try {
                 orderData = JSON.parse(req.body.orderData);
             } catch (err) {
+                console.error("❌ JSON Parse Error:", err);
                 return res.status(400).json({ error: 'Invalid order data format' });
             }
         }
 
-        // Attach Payment Proof if uploaded
+        // Attach Payment Proof
         if (req.file) {
             orderData.paymentProofImage = `/uploads/payments/${req.file.filename}`;
         }
 
+        // GENERATE ORDER ID
+        if (!orderData.id) {
+            orderData.id = `ord_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`;
+        }
+        console.log("🆔 Order ID:", orderData.id);
+
         // 1. Calculate HPP & Deduct Stock
-        // We need to fetch Recipes and Ingredients
+        console.log("1️⃣ Starting Stock Deduction Logic");
         const recipes = await Recipe.find();
         const ingredients = await Ingredient.find();
 
@@ -65,9 +73,8 @@ exports.createOrder = async (req, res) => {
         recipes.forEach(r => recipeMap.set(String(r.menuId), r.ingredients));
 
         let orderTotalHPP = 0;
-        const enrichedItems = []; // Items with locked HPP
+        const enrichedItems = [];
 
-        // Process each item in the order
         if (orderData.items && Array.isArray(orderData.items)) {
             for (const item of orderData.items) {
                 const menuId = String(item.id);
@@ -81,19 +88,18 @@ exports.createOrder = async (req, res) => {
                         const required = Number(ri.jumlah || 0);
 
                         if (ingData) {
-                            // Calculate HPP for this ingredient
+                            // Calculate HPP
                             const costPerUnit = (ingData.isi_prod && ingData.isi_prod > 0)
                                 ? (ingData.harga_beli / ingData.isi_prod)
                                 : ingData.harga_beli;
 
                             itemHPP += (costPerUnit * required);
 
-                            // DEDUCT STOCK (Only Physical)
-                            if (ingData.type === 'physical' || !ingData.type) { // Default physical
+                            // DEDUCT STOCK
+                            if (ingData.type === 'physical' || !ingData.type) {
                                 const qtyOrdered = Number(item.qty || item.count || 0);
                                 const qtyToDeduct = required * qtyOrdered;
 
-                                // Update Ingredient
                                 ingData.stok -= qtyToDeduct;
                                 await ingData.save();
 
@@ -119,15 +125,16 @@ exports.createOrder = async (req, res) => {
                 const qtyOrdered = Number(item.qty || item.count || 0);
                 orderTotalHPP += (itemHPP * qtyOrdered);
 
-                // Push to enriched items
                 enrichedItems.push({
                     ...item,
-                    hpp_locked: itemHPP // LOCK HPP HERE
+                    hpp_locked: itemHPP
                 });
             }
         }
+        console.log("✅ Stock Deduction Complete. Total HPP:", orderTotalHPP);
 
         // 2. Create Order Object
+        console.log("2️⃣ Saving Order to DB");
         const newOrder = new Order({
             ...orderData,
             items: enrichedItems,
@@ -135,8 +142,10 @@ exports.createOrder = async (req, res) => {
         });
 
         await newOrder.save();
+        console.log("✅ Order Saved Successfully");
 
-        // 3. Update Shift (Sales recording)
+        // 3. Update Shift
+        console.log("3️⃣ Updating Active Shift");
         if (newOrder.status === 'done' || newOrder.paymentStatus === 'paid') {
             const activeShift = await Shift.findOne({ endTime: null });
             if (activeShift) {
@@ -152,17 +161,30 @@ exports.createOrder = async (req, res) => {
                 activeShift.orders.push(newOrder.id);
 
                 await activeShift.save();
+                console.log("✅ Shift Updated");
+            } else {
+                console.log("⚠️ No Active Shift Found");
             }
+        } else {
+            console.log("ℹ️ Order not paid/done, skipping shift update");
         }
 
-        // 4. Update Customer Loyalty & Auto-create Customer
+        // 4. Update Customer Loyalty
+        console.log("4️⃣ Extending Customer Logic");
         if (newOrder.customerPhone && newOrder.customerPhone.length > 5) {
-            let customer = await Customer.findOne({
-                $or: [{ id: newOrder.customerId }, { phone: newOrder.customerPhone }]
-            });
+            console.log("🔍 Processing Customer for Phone:", newOrder.customerPhone);
+            let customer = null;
+            const query = [];
+
+            if (newOrder.customerId && newOrder.customerId !== 'guest') query.push({ id: newOrder.customerId });
+            if (newOrder.customerPhone) query.push({ phone: newOrder.customerPhone });
+
+            if (query.length > 0) {
+                customer = await Customer.findOne({ $or: query });
+            }
 
             if (!customer) {
-                // Create new Customer automatically
+                console.log("✨ Creating New Customer");
                 customer = new Customer({
                     id: `cust_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`,
                     name: newOrder.customerName || 'Pelanggan Baru',
@@ -173,43 +195,55 @@ exports.createOrder = async (req, res) => {
                     visitCount: 0,
                     createdAt: new Date()
                 });
+            } else {
+                console.log("✅ Customer Found:", customer.name);
             }
 
-            // Link customer to order if wasn't linked
+            // Link customer to order
             if (newOrder.customerId !== customer.id) {
                 newOrder.customerId = customer.id;
                 await newOrder.save();
+                console.log("🔗 Order Linked to Customer ID:", customer.id);
             }
 
-            // Sync/Update Customer Name if it was default/empty
+            // Sync Name
             if (newOrder.customerName && (!customer.name || customer.name === 'Pelanggan Baru')) {
                 customer.name = newOrder.customerName;
             }
 
-            // Calculate Loyalty Points (ONLY IF PAID)
-            // If unpaid, points will be added in payOrder
+            // Calculate Loyalty Points
             if (newOrder.status === 'done' || newOrder.paymentStatus === 'paid') {
-                const settings = await Settings.findOne({ key: 'businessSettings' });
-                const ratio = settings?.loyaltySettings?.pointRatio || 10000;
-                const pointsEarned = Math.floor(newOrder.total / ratio);
+                console.log("💎 Calculating Loyalty Points");
+                try {
+                    const settings = await Settings.findOne({ key: 'businessSettings' });
+                    const ratio = settings?.loyaltySettings?.pointRatio || 10000;
+                    const pointsEarned = Math.floor(newOrder.total / ratio);
 
-                customer.totalSpent += newOrder.total;
-                customer.visitCount += 1;
-                customer.points += pointsEarned;
-                customer.lastOrderDate = new Date();
-                if (pointsEarned > 0) customer.lastPointsEarned = new Date();
+                    customer.totalSpent += newOrder.total;
+                    customer.visitCount += 1;
+                    customer.points += pointsEarned;
+                    customer.lastOrderDate = new Date();
+                    if (pointsEarned > 0) customer.lastPointsEarned = new Date();
+                    console.log(`💎 Awarded ${pointsEarned} points`);
+                } catch (loyaltyErr) {
+                    console.error("⚠️ Loyalty Calculation Error:", loyaltyErr);
+                }
             }
 
             await customer.save();
+            console.log("✅ Customer Updated/Saved");
+        } else {
+            console.log("ℹ️ No valid customer info provided, skipping customer logic");
         }
 
+        console.log("🎉 Order Creation Complete");
         res.status(201).json(newOrder);
 
     } catch (err) {
-        console.error('❌ Create Order Error:', err);
-        // Log validation errors specifically
+        console.error('❌ Create Order Exception:', err);
+        console.error('Stack:', err.stack);
         if (err.name === 'ValidationError') {
-            console.error('Validation Details:', JSON.stringify(err.errors, null, 2));
+            console.error('vErr:', JSON.stringify(err.errors, null, 2));
         }
         res.status(500).json({ error: 'Server error', details: err.message });
     }

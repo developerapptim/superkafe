@@ -282,7 +282,7 @@ function CustomerLayout() {
                             rel="noopener noreferrer"
                             className="inline-block hover:opacity-80 transition-opacity group"
                         >
-                            <p className="text-[10px] text-gray-600 mb-0.5 uppercase tracking-wider">Powered by Marosdev</p>
+                            <p className="text-[10px] text-gray-600 mb-0.5 uppercase tracking-wider">Powered by LockApp.id</p>
                             <p className="text-xs font-medium text-gray-500 group-hover:text-purple-400 transition-colors">
                                 🚀 Dapatkan Aplikasi Serupa
                             </p>
