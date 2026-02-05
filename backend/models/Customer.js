@@ -14,6 +14,7 @@ const CustomerSchema = new mongoose.Schema({
     tier: { type: String, default: 'regular' },     // regular, silver, gold
     lastOrderDate: Date,
     lastPointsEarned: Date,
+    tags: { type: [String], default: [] },
     createdAt: { type: Date, default: Date.now }
 });
 

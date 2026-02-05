@@ -1,5 +1,170 @@
 import { useState, useEffect } from 'react';
 import { customersAPI, settingsAPI } from '../../services/api';
+import toast from 'react-hot-toast';
+
+const InsightModal = ({ customer, analytics, onClose, onUpdateTags }) => {
+    const [tagInput, setTagInput] = useState('');
+    if (!customer || !analytics) return null;
+
+    const { persona, topMenus, recentHistory, tags } = analytics;
+
+    // Determine Gradient based on Persona
+    const getPersonaGradient = (label) => {
+        switch (label) {
+            case 'Morning Person': return 'from-orange-400 to-yellow-300';
+            case 'Pejuang Siang': return 'from-blue-400 to-cyan-300';
+            case 'Anak Senja': return 'from-purple-500 to-orange-400';
+            case 'Sobat Begadang': return 'from-indigo-900 to-purple-800';
+            default: return 'from-gray-700 to-gray-600';
+        }
+    };
+
+    const handleAddTag = (e) => {
+        if (e.key === 'Enter' && tagInput.trim()) {
+            if (!tags.includes(tagInput.trim())) {
+                onUpdateTags([...tags, tagInput.trim()]);
+            }
+            setTagInput('');
+        }
+    };
+
+    const handleRemoveTag = (tagToRemove) => {
+        onUpdateTags(tags.filter(t => t !== tagToRemove));
+    };
+
+    return (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
+            <div className="bg-[#1a1a2e] border border-white/10 rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto shadow-2xl relative">
+                {/* Close Button */}
+                <button
+                    onClick={onClose}
+                    className="absolute top-4 right-4 p-2 rounded-full bg-black/20 hover:bg-white/10 text-white z-10 transition-colors"
+                >
+                    ✕
+                </button>
+
+                {/* HERO SECTION: Persona */}
+                <div className={`relative p-8 overflow-hidden bg-gradient-to-r ${getPersonaGradient(persona.label)}`}>
+                    <div className="relative z-10 flex flex-col md:flex-row items-center gap-6 text-white">
+                        <div className="text-6xl md:text-8xl filter drop-shadow-lg animate-bounce-slow">
+                            {persona.icon}
+                        </div>
+                        <div className="text-center md:text-left">
+                            <h2 className="text-3xl md:text-4xl font-bold mb-2 drop-shadow-md">{persona.label}</h2>
+                            <p className="text-white/90 text-lg max-w-md leading-relaxed">{persona.description}</p>
+                            <div className="mt-4 inline-flex items-center gap-2 bg-black/20 px-4 py-1.5 rounded-full backdrop-blur-md border border-white/10">
+                                <span className="font-bold">{customer.name}</span>
+                                <span className="text-white/60">|</span>
+                                <span className="text-sm opacity-90">{customer.tier.toUpperCase()}</span>
+                            </div>
+                        </div>
+                    </div>
+                    {/* Decorative Circles */}
+                    <div className="absolute -top-10 -right-10 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
+                    <div className="absolute -bottom-10 -left-10 w-48 h-48 bg-black/10 rounded-full blur-2xl"></div>
+                </div>
+
+                <div className="p-6 md:p-8 space-y-8">
+                    {/* SECTION: Top Menus */}
+                    <div>
+                        <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
+                            <span>🏆</span> Menu Favorit
+                        </h3>
+                        {topMenus.length > 0 ? (
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                {topMenus.map((menu, idx) => (
+                                    <div key={idx} className="bg-surface p-4 rounded-xl border border-white/5 flex items-center gap-4 hover:border-purple-500/30 transition-colors group">
+                                        <div className={`w-12 h-12 rounded-lg flex items-center justify-center text-xl font-bold
+                                            ${idx === 0 ? 'bg-yellow-500/20 text-yellow-500' :
+                                                idx === 1 ? 'bg-gray-400/20 text-gray-400' :
+                                                    'bg-orange-600/20 text-orange-500'}`}>
+                                            #{idx + 1}
+                                        </div>
+                                        <div>
+                                            <p className="font-bold text-white group-hover:text-purple-400 transition-colors line-clamp-1">{menu._id}</p>
+                                            <p className="text-sm text-gray-400">Dipesan {menu.totalQty}x</p>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <p className="text-gray-500 italic">Belum ada data favorit.</p>
+                        )}
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        {/* SECTION: Manual Tags */}
+                        <div>
+                            <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
+                                <span>🏷️</span> Tags & Catatan
+                            </h3>
+                            <div className="bg-surface p-4 rounded-xl border border-white/5 space-y-4">
+                                <div className="flex flex-wrap gap-2">
+                                    {tags.map((tag, idx) => (
+                                        <span key={idx} className="px-3 py-1 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30 text-sm flex items-center gap-2">
+                                            {tag}
+                                            <button onClick={() => handleRemoveTag(tag)} className="hover:text-white">×</button>
+                                        </span>
+                                    ))}
+                                    <input
+                                        type="text"
+                                        value={tagInput}
+                                        onChange={(e) => setTagInput(e.target.value)}
+                                        onKeyDown={handleAddTag}
+                                        placeholder="+ Tag (Enter)"
+                                        className="bg-transparent text-sm focus:outline-none min-w-[100px] text-gray-300 placeholder-gray-600"
+                                    />
+                                </div>
+                                <p className="text-xs text-gray-500">Tekan Enter untuk menambah tag baru.</p>
+                            </div>
+                        </div>
+
+                        {/* SECTION: Recent History */}
+                        <div>
+                            <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
+                                <span>🕒</span> Riwayat Terakhir
+                            </h3>
+                            <div className="bg-surface rounded-xl border border-white/5 overflow-hidden">
+                                <table className="w-full text-sm text-left">
+                                    <thead className="bg-white/5 text-gray-400">
+                                        <tr>
+                                            <th className="p-3">Waktu</th>
+                                            <th className="p-3 text-right">Total</th>
+                                            <th className="p-3 text-center">Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-white/5">
+                                        {recentHistory.map((order, idx) => (
+                                            <tr key={idx}>
+                                                <td className="p-3 text-gray-300">
+                                                    {new Date(order.timestamp).toLocaleDateString()}<br />
+                                                    <span className="text-xs text-gray-500">{new Date(order.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                                                </td>
+                                                <td className="p-3 text-right font-mono">
+                                                    {new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(order.total)}
+                                                </td>
+                                                <td className="p-3 text-center">
+                                                    <span className={`text-xs px-2 py-0.5 rounded-full ${order.status === 'done' ? 'bg-green-500/20 text-green-400' : 'bg-yellow-500/20 text-yellow-400'}`}>
+                                                        {order.status}
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                        {recentHistory.length === 0 && (
+                                            <tr>
+                                                <td colSpan="3" className="p-4 text-center text-gray-500">Belum ada riwayat.</td>
+                                            </tr>
+                                        )}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
 
 function Pelanggan() {
     const [activeTab, setActiveTab] = useState('data');
@@ -7,6 +172,11 @@ function Pelanggan() {
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState('');
     const [showModal, setShowModal] = useState(false);
+
+    // Analytics & Insight State
+    const [showInsightModal, setShowInsightModal] = useState(false);
+    const [selectedCustomer, setSelectedCustomer] = useState(null);
+    const [analyticsData, setAnalyticsData] = useState(null);
 
     const [formData, setFormData] = useState({
         name: '',
@@ -149,6 +319,40 @@ function Pelanggan() {
         }
     };
 
+    // Fetch Analytics
+    const handleCustomerClick = async (customer) => {
+        const toastId = toast.loading('Memuat insight pelanggan...');
+        try {
+            const res = await customersAPI.getAnalytics(customer.id);
+            setAnalyticsData(res.data);
+            setSelectedCustomer(customer);
+            setShowInsightModal(true);
+            toast.dismiss(toastId);
+        } catch (err) {
+            console.error("Analytics Error:", err);
+            toast.error("Gagal memuat data insight", { id: toastId });
+        }
+    };
+
+    // Update Tags
+    const handleUpdateTags = async (newTags) => {
+        try {
+            // Optimistic update
+            setAnalyticsData(prev => ({ ...prev, tags: newTags }));
+
+            await customersAPI.update(selectedCustomer.id, {
+                tags: newTags
+            });
+            toast.success('Tags diperbarui');
+
+            // Refresh customer list to keep sync? Optional but good.
+            // fetchCustomers(); 
+        } catch (err) {
+            console.error(err);
+            toast.error('Gagal update tags');
+        }
+    };
+
     return (
         <section className="p-4 md:p-6 space-y-6">
             {/* Header */}
@@ -219,8 +423,16 @@ function Pelanggan() {
                                                 filteredCustomers.map(c => {
                                                     const tierInfo = getTierInfo(c.tier);
                                                     return (
-                                                        <tr key={c.id} className="hover:bg-white/5">
-                                                            <td className="px-4 py-3 font-medium">{c.name}</td>
+                                                        <tr
+                                                            key={c.id}
+                                                            className="hover:bg-white/5 cursor-pointer transition-colors"
+                                                            onClick={() => handleCustomerClick(c)}
+                                                            title="Klik untuk lihat insight"
+                                                        >
+                                                            <td className="px-4 py-3 font-medium">
+                                                                {c.name}
+                                                                {c.tags && c.tags.includes('VIP') && <span className="ml-2 text-[10px] bg-yellow-500/20 text-yellow-400 px-1.5 py-0.5 rounded border border-yellow-500/30">VIP</span>}
+                                                            </td>
                                                             <td className="px-4 py-3">{c.phone || '-'}</td>
                                                             <td className={`px-4 py-3 ${tierInfo.color}`}>{tierInfo.label}</td>
                                                             <td className="px-4 py-3 text-right">{c.points || 0}</td>
@@ -404,6 +616,16 @@ function Pelanggan() {
                         </form>
                     </div>
                 </div>
+            )}
+
+            {/* INSIGHT MODAL */}
+            {showInsightModal && selectedCustomer && analyticsData && (
+                <InsightModal
+                    customer={selectedCustomer}
+                    analytics={analyticsData}
+                    onClose={() => setShowInsightModal(false)}
+                    onUpdateTags={handleUpdateTags}
+                />
             )}
         </section>
     );

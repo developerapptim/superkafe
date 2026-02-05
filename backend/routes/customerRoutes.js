@@ -8,5 +8,6 @@ router.use(checkApiKey);
 router.get('/search', CustomerController.searchCustomers);
 router.get('/', CustomerController.getCustomers);
 router.post('/', CustomerController.upsertCustomer); // Combined Create/Update
+router.get('/:id/analytics', CustomerController.getAnalytics);
 
 module.exports = router;
