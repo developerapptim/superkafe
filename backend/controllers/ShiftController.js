@@ -113,10 +113,63 @@ exports.endShift = async (req, res) => {
 // Alias for Close Shift (Request Requirement)
 exports.closeShift = exports.endShift;
 
+exports.getShiftHistory = async (req, res) => {
+    try {
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+        const skip = (page - 1) * limit;
+
+        const totalItems = await Shift.countDocuments({ status: 'CLOSED' });
+        const history = await Shift.find({ status: 'CLOSED' })
+            .sort({ endTime: -1 })
+            .skip(skip)
+            .limit(limit);
+
+        // Ensure variance is calculated if missing (backward compatibility)
+        const processedHistory = history.map(shift => {
+            const s = shift.toObject();
+            if (s.variance === undefined && s.difference !== undefined) {
+                s.variance = s.difference;
+            }
+            return s;
+        });
+
+        res.json({
+            data: processedHistory,
+            pagination: {
+                currentPage: page,
+                totalPages: Math.ceil(totalItems / limit),
+                totalItems,
+                hasMore: (page * limit) < totalItems
+            }
+        });
+    } catch (err) {
+        console.error('Get shift history error:', err);
+        res.status(500).json({ error: 'Server error' });
+    }
+};
+
 exports.getActivities = async (req, res) => {
     try {
-        const logs = await ActivityLog.find().sort({ timestamp: -1 }).limit(100);
-        res.json(logs);
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 20; // Default 20
+        const skip = (page - 1) * limit;
+
+        const totalItems = await ActivityLog.countDocuments();
+        const logs = await ActivityLog.find()
+            .sort({ timestamp: -1 })
+            .skip(skip)
+            .limit(limit);
+
+        res.json({
+            data: logs,
+            pagination: {
+                currentPage: page,
+                totalPages: Math.ceil(totalItems / limit),
+                totalItems,
+                hasMore: (page * limit) < totalItems
+            }
+        });
     } catch (err) {
         console.error('Get activities error:', err);
         res.status(500).json({ error: 'Server error' });

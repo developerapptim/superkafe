@@ -10,6 +10,7 @@ router.post('/start', ShiftController.startShift); // Legacy/Internal
 router.post('/open', ShiftController.openShift); // New Request
 router.get('/current', ShiftController.getCurrentShift);
 router.get('/current-balance', ShiftController.getCurrentBalance);
+router.get('/history', ShiftController.getShiftHistory); // NEW
 router.get('/activities', ShiftController.getActivities); // NEW
 router.post('/end', ShiftController.endShift); // Legacy/Internal
 router.put('/close', ShiftController.closeShift); // New Request

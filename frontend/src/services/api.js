@@ -88,9 +88,10 @@ export const tablesAPI = {
 export const shiftAPI = {
     getCurrent: () => api.get('/shifts/current'),
     getCurrentBalance: () => api.get('/shifts/current-balance'),
+    getHistory: (params) => api.get('/shifts/history', { params }), // NEW
     startShift: (data) => api.post('/shifts/start', data),
     endShift: (data) => api.post('/shifts/end', data),
-    getActivities: () => api.get('/shifts/activities'), // NEW
+    getActivities: (params) => api.get('/shifts/activities', { params }), // NEW
 };
 
 // ========== INVENTORY API ==========
