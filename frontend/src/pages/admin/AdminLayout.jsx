@@ -150,7 +150,7 @@ function AdminLayout() {
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
                 onClick={() => setShowCmd(true)}
-                className="fixed bottom-8 right-8 z-50 p-4 bg-blue-600 text-white rounded-full shadow-2xl shadow-blue-600/40 border-2 border-white/10 cursor-grab active:cursor-grabbing hover:bg-blue-500 transition-colors"
+                className="fixed bottom-48 md:bottom-32 right-8 z-50 p-4 bg-blue-600/20 hover:bg-blue-600/80 text-white/70 hover:text-white rounded-full shadow-lg shadow-blue-500/10 hover:shadow-blue-500/40 border border-white/5 hover:border-white/20 backdrop-blur-sm cursor-grab active:cursor-grabbing transition-all duration-300 group"
                 title="Cari (Ctrl+K)"
             >
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">

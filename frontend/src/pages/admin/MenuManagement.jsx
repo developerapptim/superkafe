@@ -100,11 +100,11 @@ const MenuItem = ({ item, saveOrder, getCategoryEmoji, getCategoryName, formatCu
                 </div>
 
                 {/* Actions Section */}
-                <div className="flex items-center justify-end gap-2 w-full md:w-auto pt-2 md:pt-0 border-t border-white/5 md:border-none">
+                <div className="flex items-center justify-end gap-1.5 md:gap-2 w-full md:w-auto pt-2 md:pt-0 border-t border-white/5 md:border-none">
                     {/* STATUS TOGGLE */}
                     <button
                         onClick={() => handleToggleStatus(item)}
-                        className={`flex-1 md:flex-none py-1.5 md:py-2 px-3 rounded-lg transition-all text-sm font-medium flex items-center justify-center gap-2 ${item.is_active
+                        className={`flex-1 md:flex-none py-1.5 md:py-2 px-2 md:px-3 rounded-lg transition-all text-xs md:text-sm font-medium flex items-center justify-center gap-1 md:gap-2 ${item.is_active
                             ? 'bg-green-500/10 text-green-400 hover:bg-green-500/20'
                             : 'bg-red-500/10 text-red-500 hover:bg-red-500/20'}`}
                         title={item.is_active ? "Nonaktifkan" : "Aktifkan"}
@@ -118,17 +118,17 @@ const MenuItem = ({ item, saveOrder, getCategoryEmoji, getCategoryName, formatCu
 
                     <button
                         onClick={() => openEditModal(item)}
-                        className="flex-1 md:flex-none py-1.5 md:py-2 px-3 rounded-lg bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 transition-colors flex items-center justify-center gap-2"
+                        className="flex-1 md:flex-none py-1.5 md:py-2 px-2 md:px-3 rounded-lg bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 transition-colors text-xs md:text-sm flex items-center justify-center gap-1 md:gap-2"
                         title="Edit"
                     >
-                        <span>✏️</span> <span className="md:hidden text-sm">Edit</span>
+                        <span>✏️</span> <span className="md:hidden">Edit</span>
                     </button>
                     <button
                         onClick={() => handleDelete(item)}
-                        className="flex-1 md:flex-none py-1.5 md:py-2 px-3 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-colors flex items-center justify-center gap-2"
+                        className="flex-1 md:flex-none py-1.5 md:py-2 px-2 md:px-3 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-colors text-xs md:text-sm flex items-center justify-center gap-1 md:gap-2"
                         title="Hapus"
                     >
-                        <span>🗑️</span> <span className="md:hidden text-sm">Hapus</span>
+                        <span>🗑️</span> <span className="md:hidden">Hapus</span>
                     </button>
                 </div>
             </div>
