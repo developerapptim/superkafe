@@ -55,7 +55,8 @@ exports.updateStatus = async (req, res) => {
         await table.save();
         res.json(table);
     } catch (err) {
-        res.status(500).json({ error: 'Server error' });
+        console.error('Update status error:', err);
+        res.status(500).json({ error: 'Server error: ' + err.message });
     }
 };
 

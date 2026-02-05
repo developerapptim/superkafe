@@ -94,12 +94,12 @@ function AdminLayout() {
                     className="flex lg:hidden h-14 items-center px-4 gap-3 border-b border-purple-500/30 bg-[#151235] transition-all duration-300"
                 >
                     {/* Toggle Logo */}
-                    <div
+                    <img
+                        src="https://res.cloudinary.com/dhjqb65mf/image/upload/v1770018588/Picsart_26-02-02_15-46-53-772_vw9xc3.png"
+                        alt="Logo"
                         onClick={toggleSidebar}
-                        className="w-8 h-8 rounded bg-gradient-to-br from-purple-600 to-blue-600 flex items-center justify-center text-white font-bold shadow-lg cursor-pointer hover:scale-105 transition-transform shrink-0"
-                    >
-                        WS
-                    </div>
+                        className="w-8 h-8 rounded bg-transparent object-cover cursor-pointer hover:scale-105 transition-transform shrink-0"
+                    />
                     {/* Page Title */}
                     <h1 className="text-white font-semibold text-lg truncate flex-1">
                         {(() => {
@@ -150,7 +150,7 @@ function AdminLayout() {
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
                 onClick={() => setShowCmd(true)}
-                className="fixed bottom-48 md:bottom-32 right-8 z-50 p-4 bg-blue-600/20 hover:bg-blue-600/80 text-white/70 hover:text-white rounded-full shadow-lg shadow-blue-500/10 hover:shadow-blue-500/40 border border-white/5 hover:border-white/20 backdrop-blur-sm cursor-grab active:cursor-grabbing transition-all duration-300 group"
+                className="fixed bottom-48 md:bottom-32 right-8 z-50 p-4 bg-blue-600/20 hover:bg-blue-600/80 text-white/70 hover:text-white rounded-full shadow-lg shadow-blue-500/10 hover:shadow-blue-500/40 border border-white/5 hover:border-white/20 backdrop-blur-sm cursor-grab active:cursor-grabbing transition-colors duration-300 group"
                 title="Cari (Ctrl+K)"
             >
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">

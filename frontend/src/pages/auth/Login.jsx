@@ -84,10 +84,8 @@ function Login() {
                             <img src={appSettings.logo} alt="Logo" className="w-full h-full object-contain drop-shadow-lg" />
                         </div>
                     ) : (
-                        <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-purple-600 to-blue-600 mx-auto flex items-center justify-center mb-6 shadow-lg shadow-purple-500/20 transform hover:scale-105 transition-transform duration-300">
-                            <svg className="w-12 h-12 text-white" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M2,21H20V19H2M20,8H18V5H20M20,3H4V13A4,4 0 0,0 8,17H14A4,4 0 0,0 18,13V10H20A2,2 0 0,0 22,8V5C22,3.89 21.1,3 20,3Z" />
-                            </svg>
+                        <div className="w-24 h-24 mx-auto mb-6 transform hover:scale-105 transition-transform duration-300">
+                            <img src="https://res.cloudinary.com/dhjqb65mf/image/upload/v1770018588/Picsart_26-02-02_15-46-53-772_vw9xc3.png" alt="Logo" className="w-full h-full object-contain drop-shadow-lg" />
                         </div>
                     )}
                     <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent mb-2">

@@ -527,10 +527,10 @@ function MenuManagement() {
                         <span>➕</span> Tambah
                     </button>
                 </div>
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2 md:gap-3">
+                <div className="flex overflow-x-auto pb-2 snap-x md:grid md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2 md:gap-3 custom-scrollbar">
                     <button
                         onClick={() => setSelectedCategory('all')}
-                        className={`relative p-2 md:p-3 rounded-xl text-left border transition-all flex items-center justify-between group overflow-hidden ${selectedCategory === 'all'
+                        className={`relative min-w-[140px] md:min-w-0 flex-shrink-0 snap-start p-2 md:p-3 rounded-xl text-left border transition-all flex items-center justify-between group overflow-hidden ${selectedCategory === 'all'
                             ? 'border-purple-500 text-white'
                             : 'border-transparent hover:bg-white/10'
                             }`}
@@ -554,7 +554,7 @@ function MenuManagement() {
                             <div
                                 key={cat.id}
                                 onClick={() => setSelectedCategory(cat.id)}
-                                className={`relative group p-2 md:p-3 rounded-xl border transition-all flex items-center justify-between cursor-pointer overflow-hidden ${isSelected
+                                className={`relative group min-w-[140px] md:min-w-0 flex-shrink-0 snap-start p-2 md:p-3 rounded-xl border transition-all flex items-center justify-between cursor-pointer overflow-hidden ${isSelected
                                     ? 'border-purple-500 text-white'
                                     : 'border-white/5 hover:bg-white/10'
                                     }`}

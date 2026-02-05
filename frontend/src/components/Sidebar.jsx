@@ -127,9 +127,11 @@ function Sidebar({ onLogout, isCollapsed, toggleSidebar }) {
         title={isCollapsed ? "Klik untuk expand" : "Klik untuk collapse"}
       >
         <div className={`flex items-center gap-3 transition-all duration-300 ${isCollapsed ? 'justify-center w-full' : ''}`}>
-          <div className="w-8 h-8 rounded bg-gradient-to-br from-purple-600 to-blue-600 flex items-center justify-center text-white font-bold shrink-0 shadow-lg group-hover:scale-105 transition-transform">
-            WS
-          </div>
+          <img
+            src="https://res.cloudinary.com/dhjqb65mf/image/upload/v1770018588/Picsart_26-02-02_15-46-53-772_vw9xc3.png"
+            alt="Logo"
+            className="w-8 h-8 rounded bg-transparent object-cover shrink-0 shadow-lg group-hover:scale-105 transition-transform"
+          />
           <div className={`overflow-hidden transition-all duration-300 ${isCollapsed ? 'w-0 opacity-0' : 'w-auto opacity-100 hidden lg:block'}`}>
             <h1 className="font-bold text-white text-sm whitespace-nowrap">Admin Panel</h1>
             <p className="text-xs text-gray-400 whitespace-nowrap">
