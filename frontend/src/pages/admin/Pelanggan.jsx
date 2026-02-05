@@ -63,7 +63,8 @@ function Pelanggan() {
         try {
             setLoading(true);
             const res = await customersAPI.getAll();
-            const data = Array.isArray(res.data) ? res.data : [];
+            // Handle { data: [], total: ... } vs []
+            const data = res.data.data && Array.isArray(res.data.data) ? res.data.data : (Array.isArray(res.data) ? res.data : []);
             setCustomers(data);
         } catch (err) {
             console.error('Error fetching customers:', err);

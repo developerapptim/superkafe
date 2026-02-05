@@ -167,13 +167,22 @@ function Kasir() {
 
     // Audio State
     const [isMuted, setIsMuted] = useState(() => localStorage.getItem('pos_muted') === 'true');
-    const prevOrdersLength = useRef(0);
+    const prevOrdersLength = useRef(-1);
 
+    // Audio Logic
     // Audio Logic
     useEffect(() => {
         if (!ordersData) return;
 
         const totalOrders = ordersData.length;
+
+        // Skip notification on first load (when prev is 0 and we theoretically have just loaded data)
+        // Better approach: initialize prevOrdersLength with null or -1 to distinguish "initial state" from "0 orders"
+        if (prevOrdersLength.current === -1) {
+            prevOrdersLength.current = totalOrders;
+            return;
+        }
+
         // Check if new order arrived (count increased)
         if (totalOrders > prevOrdersLength.current) {
             const hasNew = ordersData.some(o => o.status === 'new');

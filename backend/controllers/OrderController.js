@@ -198,13 +198,21 @@ exports.createOrder = async (req, res) => {
 
         // 4. Update Customer Loyalty
         console.log("4️⃣ Extending Customer Logic");
-        if (newOrder.customerPhone && newOrder.customerPhone.length > 5) {
-            console.log("🔍 Processing Customer for Phone:", newOrder.customerPhone);
+        if (newOrder.customerPhone || (newOrder.customerName && newOrder.customerName !== 'Pelanggan Baru')) {
+            console.log("🔍 Processing Customer Logic");
             let customer = null;
             const query = [];
 
             if (newOrder.customerId && newOrder.customerId !== 'guest') query.push({ id: newOrder.customerId });
-            if (newOrder.customerPhone) query.push({ phone: newOrder.customerPhone });
+            if (newOrder.customerPhone && newOrder.customerPhone.length > 5) query.push({ phone: newOrder.customerPhone });
+
+            // If No Phone/ID but has Name, try to find by Name (Case Insensitive) ?
+            // Risk: "Aldy" vs "aldy" vs "Aldy " -> Duplicates.
+            // Decision: If only Name provided, we create NEW customer or update if exactly matches?
+            // For now, let's include name in search if phone is missing
+            if ((!newOrder.customerPhone || newOrder.customerPhone.length < 6) && newOrder.customerName) {
+                query.push({ name: new RegExp('^' + newOrder.customerName.trim() + '$', 'i') });
+            }
 
             if (query.length > 0) {
                 customer = await Customer.findOne({ $or: query });
@@ -215,7 +223,7 @@ exports.createOrder = async (req, res) => {
                 customer = new Customer({
                     id: `cust_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`,
                     name: newOrder.customerName || 'Pelanggan Baru',
-                    phone: newOrder.customerPhone,
+                    phone: newOrder.customerPhone, // Can be null/empty
                     tier: 'regular',
                     points: 0,
                     totalSpent: 0,
@@ -233,9 +241,12 @@ exports.createOrder = async (req, res) => {
                 console.log("🔗 Order Linked to Customer ID:", customer.id);
             }
 
-            // Sync Name
+            // Sync Name/Phone if missing in customer
             if (newOrder.customerName && (!customer.name || customer.name === 'Pelanggan Baru')) {
                 customer.name = newOrder.customerName;
+            }
+            if (newOrder.customerPhone && !customer.phone) {
+                customer.phone = newOrder.customerPhone;
             }
 
             // Calculate Loyalty Points
@@ -348,9 +359,20 @@ exports.payOrder = async (req, res) => {
         let customer = null;
         if (order.customerId && order.customerId !== 'guest') {
             customer = await Customer.findOne({ id: order.customerId });
-        } else if (order.customerPhone && order.customerPhone.length > 5) {
-            // If no ID linked, try finding by phone
-            customer = await Customer.findOne({ phone: order.customerPhone });
+        } else if ((order.customerPhone && order.customerPhone.length > 5) || (order.customerName && order.customerName !== 'Pelanggan Baru')) {
+            // Find by Phone or Name
+            const query = [];
+            if (order.customerPhone && order.customerPhone.length > 5) {
+                query.push({ phone: order.customerPhone });
+            }
+            if (!order.customerPhone && order.customerName) {
+                query.push({ name: new RegExp('^' + order.customerName.trim() + '$', 'i') });
+            }
+
+            if (query.length > 0) {
+                customer = await Customer.findOne({ $or: query });
+            }
+
             if (!customer) {
                 // Create new Customer
                 customer = new Customer({
