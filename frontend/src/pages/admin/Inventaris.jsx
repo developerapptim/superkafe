@@ -452,6 +452,17 @@ function Inventaris() {
         }
     };
 
+    // Helper to prevent "05" issue in number inputs
+    const handleNumberChange = (field, value) => {
+        // Remove leading zero if it's followed by a number (not a dot)
+        // Example: "05" -> "5", "0.5" -> "0.5", "0" -> "0"
+        let cleanValue = value;
+        if (cleanValue.length > 1 && cleanValue.startsWith('0') && cleanValue[1] !== '.') {
+            cleanValue = cleanValue.replace(/^0+/, '');
+        }
+        setFormData(prev => ({ ...prev, [field]: cleanValue }));
+    };
+
     // Removed handleStockAdjust since logic is removed
 
     // Handle opname change
@@ -1084,7 +1095,7 @@ function Inventaris() {
                                         <input
                                             type="number"
                                             value={formData.stok}
-                                            onChange={(e) => setFormData({ ...formData, stok: e.target.value })}
+                                            onChange={(e) => handleNumberChange('stok', e.target.value)}
                                             className={`w-full px-4 py-2 rounded-lg bg-white/5 border border-purple-500/30 text-white focus:outline-none focus:border-purple-500 ${editingItem ? 'opacity-50 cursor-not-allowed' : ''}`}
                                             disabled={!!editingItem}
                                         />
@@ -1154,7 +1165,7 @@ function Inventaris() {
                                     <input
                                         type="number"
                                         value={formData.harga_beli}
-                                        onChange={(e) => setFormData({ ...formData, harga_beli: e.target.value })}
+                                        onChange={(e) => handleNumberChange('harga_beli', e.target.value)}
                                         className="w-full px-4 py-2 rounded-lg bg-white/5 border border-purple-500/30 text-white focus:outline-none focus:border-purple-500"
                                     />
                                 </div>
@@ -1164,7 +1175,7 @@ function Inventaris() {
                                         <input
                                             type="number"
                                             value={formData.stok_min}
-                                            onChange={(e) => setFormData({ ...formData, stok_min: e.target.value })}
+                                            onChange={(e) => handleNumberChange('stok_min', e.target.value)}
                                             className="w-full px-4 py-2 rounded-lg bg-white/5 border border-purple-500/30 text-white focus:outline-none focus:border-purple-500"
                                         />
                                     </div>
