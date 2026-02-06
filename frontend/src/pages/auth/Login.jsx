@@ -14,24 +14,24 @@ function Login() {
         logo: 'https://res.cloudinary.com/dhjqb65mf/image/upload/v1770018588/Picsart_26-02-02_15-46-53-772_vw9xc3.png'
     });
 
-    useEffect(() => {
-        const fetchSettings = async () => {
-            try {
-                const res = await api.get('/settings/public');
-                if (res.data) {
-                    setAppSettings(prev => ({
-                        ...prev,
-                        businessName: res.data.businessName || 'SuperKafe Apps',
-                        tagline: res.data.tagline || prev.tagline,
-                        logo: res.data.logo || prev.logo
-                    }));
-                }
-            } catch (error) {
-                console.error('Failed to fetch public settings:', error);
-            }
-        };
-        fetchSettings();
-    }, []);
+    // useEffect(() => {
+    //     const fetchSettings = async () => {
+    //         try {
+    //             const res = await api.get('/settings/public');
+    //             if (res.data) {
+    //                 setAppSettings(prev => ({
+    //                     ...prev,
+    //                     businessName: res.data.businessName || 'SuperKafe Apps',
+    //                     tagline: res.data.tagline || prev.tagline,
+    //                     logo: res.data.logo || prev.logo
+    //                 }));
+    //             }
+    //         } catch (error) {
+    //             console.error('Failed to fetch public settings:', error);
+    //         }
+    //     };
+    //     fetchSettings();
+    // }, []);
 
     const handleLogin = async (e) => {
         e.preventDefault();

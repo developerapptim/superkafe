@@ -228,14 +228,14 @@ function Dashboard() {
 
             {/* Transaction History */}
             <div className="glass rounded-xl p-4">
-                <div className="flex items-center justify-between mb-4">
-                    <h3 className="font-bold">📜 Riwayat Transaksi Hari Ini</h3>
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
+                    <h3 className="font-bold text-lg">📜 Riwayat Transaksi Hari Ini</h3>
                     <input
                         type="text"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                         placeholder="🔍 Cari Nama / Meja..."
-                        className="bg-surface/50 border border-gray-700/50 rounded-lg px-3 py-1 text-sm text-white focus:ring-2 focus:ring-purple-500 outline-none"
+                        className="w-full md:w-64 bg-white/5 border border-gray-700/50 rounded-lg px-4 py-2 text-sm text-white focus:ring-2 focus:ring-purple-500 outline-none transition-all"
                     />
                 </div>
 
