@@ -8,28 +8,7 @@ const compression = require('compression');
 // Initialize App
 const app = express();
 app.use(compression());
-const allowedOrigins = [
-  'http://localhost:5173',
-  'http://localhost:5174',
-  'https://superkafe.vercel.app',
-  process.env.FRONTEND_URL // Useful for production deployment
-].filter(Boolean);
-
-app.use(cors({
-  origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl requests)
-    if (!origin) return callback(null, true);
-
-    if (allowedOrigins.indexOf(origin) !== -1) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'x-api-key']
-}));
+app.use(cors());
 app.use(express.json({ limit: '50mb' }));
 
 // ===== STATIC FILES =====
