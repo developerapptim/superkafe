@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 
 const OperationalExpense = require('../models/OperationalExpense');
-const { logActivity } = require('../utils/activityLogger');
+
 
 const isOwner = (req) => {
     const logPath = path.join(__dirname, '../debug_rbac.txt');
@@ -103,13 +103,13 @@ exports.createExpense = async (req, res) => {
 
         await newItem.save();
 
-        await logActivity({
-            req,
-            action: 'CREATE_EXPENSE',
-            module: 'FINANCE',
-            description: `Created expense: ${category} - Rp ${amount}`,
-            metadata: { id: newItem.id, amount, category }
-        });
+        // await logActivity({
+        //     req,
+        //     action: 'CREATE_EXPENSE',
+        //     module: 'FINANCE',
+        //     description: `Created expense: ${category} - Rp ${amount}`,
+        //     metadata: { id: newItem.id, amount, category }
+        // });
 
         res.status(201).json(newItem);
 
@@ -145,18 +145,18 @@ exports.updateExpense = async (req, res) => {
             { new: true }
         );
 
-        await logActivity({
-            req,
-            action: 'UPDATE_EXPENSE',
-            module: 'FINANCE',
-            description: `Updated expense: ${item.description}`,
-            metadata: {
-                id,
-                oldAmount,
-                newAmount: updatedItem.amount,
-                changes: updates
-            }
-        });
+        // await logActivity({
+        //     req,
+        //     action: 'UPDATE_EXPENSE',
+        //     module: 'FINANCE',
+        //     description: `Updated expense: ${item.description}`,
+        //     metadata: {
+        //         id,
+        //         oldAmount,
+        //         newAmount: updatedItem.amount,
+        //         changes: updates
+        //     }
+        // });
 
         res.json(updatedItem);
 
@@ -182,13 +182,13 @@ exports.deleteExpense = async (req, res) => {
 
         await item.save();
 
-        await logActivity({
-            req,
-            action: 'DELETE_EXPENSE',
-            module: 'FINANCE',
-            description: `Deleted expense: ${item.category} - ${item.description}`,
-            metadata: { id }
-        });
+        // await logActivity({
+        //     req,
+        //     action: 'DELETE_EXPENSE',
+        //     module: 'FINANCE',
+        //     description: `Deleted expense: ${item.category} - ${item.description}`,
+        //     metadata: { id }
+        // });
 
         res.json({ message: 'Expense deleted successfully' });
 
