@@ -13,6 +13,7 @@ jobs:
           host: 76.13.196.116
           username: root
           key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22
           script: |
             export PATH=$PATH:/root/.nvm/versions/node/v24.13.1/bin
             cd /root/superkafe
