@@ -4926,7 +4926,7 @@
       modal.className = 'fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50';
       modal.innerHTML = `
         <div class="glass rounded-2xl p-6 max-w-md w-full animate-fade">
-          <h3 class="text-xl font-bold mb-4">➕ Tambah Menu Baru</h3>
+          <h3 class="text-xl font-bold mb-4">➕ Tambah Menu Baruu</h3>
           <div class="space-y-4">
             <!-- Image Upload -->
             <div>
