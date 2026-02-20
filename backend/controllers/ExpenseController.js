@@ -1,6 +1,9 @@
 const fs = require('fs');
 const path = require('path');
 
+const OperationalExpense = require('../models/OperationalExpense');
+const { logActivity } = require('../utils/activityLogger');
+
 const isOwner = (req) => {
     const logPath = path.join(__dirname, '../debug_rbac.txt');
     const logMsg = `[${new Date().toISOString()}] User: ${JSON.stringify(req.user)} | Role: ${req.user?.role}\n`;
