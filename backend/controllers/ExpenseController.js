@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const OperationalExpense = require('../models/OperationalExpense');
+const OperationalExpense = require('../models/OperationalExpenses');
 
 
 const isOwner = (req) => {
